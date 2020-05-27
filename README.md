@@ -53,7 +53,7 @@ if you have difficulty to understand the **interaction between Kubernetes Ingres
 ### Docker
 
 **Docker** is a tool designed to make it easier to create, deploy, and run applications by using containers. Containers allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package.
-[More details here](https://docs.docker.com/engine/install/).  
+[More details here](https://blog.usejournal.com/what-is-docker-in-simple-english-a24e8136b90b).  
 For more informations, you can also check my project `ft_server` about docker containers and docker files usage [Here](https://github.com/GuillaumeOz/42_Ft_server/).  
 
 ### Wordpress
