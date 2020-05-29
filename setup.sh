@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/05/28 16:57:58 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/05/29 14:36:57 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -68,17 +68,33 @@ function install_packages()
 
 function apply_yaml()
 {
-	#kubectl apply - Apply or Update a resource from a file or stdin.
+	# kubectl apply - Apply or Update a resource from a file or stdin.
 	# Create a service using the definition in example-service.yaml.
 	kubectl apply -f srcs/$@.yaml > /dev/null
 	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
 	sleep 2;
-	# -l <clé-label>=<valeur-label> -o jsonpath=<modèle>
+	# kubectl [command] [TYPE] [NAME] [flags]
+	# [command] = get
+	# [TYPE] = pods
+	# [NAME] = Omitted, here details for all resources are displayed for 'kubectl get pods'
+	# [flags1] = -l <clé-label>=<valeur-label>
+	# [flags2] = -o or --output jsonpath=<modèle> 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' >> check fomatting output
 	while [[ $(kubectl get pods -l app=$@ -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
 		sleep 1;
 	done
 	echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 }
+
+if [[ $1 = 'clean' ]] ; then
+	echo -ne "$_GREEN➜$_YELLOW	Cleaning all services...\n"
+	for SERVICE in $SERVICE_LIST ; do
+	# Delete a pod using the type and name specified in the pod.yaml file.
+		kubectl delete -f srcs/$SERVICE.yaml > /dev/null
+	done
+	kubectl delete -f srcs/ingress.yaml > /dev/null
+	echo -ne "$_GREEN✓$_YELLOW	Clean complete !\n"
+	exit
+fi
 
 echo -e 	"\n\n $_WHITE
 ███████╗████████╗     ███████╗███████╗██████╗ ██╗   ██╗██╗ ██████╗███████╗███████╗
@@ -169,5 +185,21 @@ fi
 [ -z "${WORKDIR}" ] && WORKDIR=`pwd`
 mkdir -p $WORKDIR/$USER
 # Set the minikube directory in current folder
-#export MINIKUBE_HOME="/goinfre/$USER"# Its is necessary ?
+# export MINIKUBE_HOME="/goinfre/$USER"# Its is necessary ?
 
+#-------------------Start Minikube------------------#
+# Start the cluster if it's not running
+# What you’ll need 
+# 2 CPUs or more
+# 2GB of free memory
+# 20GB of free disk space
+# Internet connection
+# Container or VirtualBox
+if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
+	minikube start --cpus=2 --memory 4000 --vm-driver=virtualbox --extra-config=apiserver.service-node-port-range=1-35000
+	minikube addons enable metrics-server
+	minikube addons enable ingress
+	minikube addons enable dashboard
+fi
+
+MINIKUBE_IP=$(minikube ip)

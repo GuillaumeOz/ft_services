@@ -83,15 +83,44 @@ WordPress requires MySQL to store and retrieve all of its data including post co
 **InfluxDB** is an open-source time series database(TSDB) developed by InfluxData. It is written in Go and optimized for fast, high-availability storage and retrieval of time series data in fields such as operations monitoring, application metrics, Internet of Things sensor data, and real-time analytics. It also has support for processing data from Graphite.
 In our project, InfluxDB will stock the necessairy data for running Grafana application.
 
-# REDO THIS PART WITH setup.sh
-### Common tasks
+## Usage
 
-* `make up` builds the image and runs it as a container
-* `make clean` removes the image and the container
-* `make autoindex-on` enables directory listing
-* `make autoindex-off` disables directory listing
+The setup script check if : ```Docker```, ```VirtualBox```, ```minikube``` and ```kubectl``` are installed.
+If not the script installs it for you.
 
-# REDO THIS PART WITH setup.sh
+* Setup :
+
+```shell
+# Start the setup
+./setup.sh
+
+# Remove all containers
+./setup.sh clean
+```
+
+* Exposed services access :
+
+```ip_address:port```
+
+* SSH :
+
+```shell
+ssh admin@$(minikube ip) -p 4000
+```
+
+* FTPS :
+
+Use ```Filezilla``` and connect with ```admin:admin``` on port 21
+
+## PORTS
+
+* ```FTPS``` on port 21
+* ```MySQL``` on port 3306
+* ```Wordpress``` on port 5050
+* ```Phpmyadmin``` on port 5050
+* ```Grafana``` on port 3000
+* ```InfluxDB``` on port 8086
+* ```Nginx``` on port 80, 443 (SSL) and 4000 (SSH)
 
 ### Acknowledgements
 

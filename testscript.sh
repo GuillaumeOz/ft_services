@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/27 09:36:09 by gozsertt          #+#    #+#              #
-#    Updated: 2020/05/28 15:37:18 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/05/29 12:51:02 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,15 @@ _PURPLE='\033[35m'
 _CYAN='\033[36m'
 _WHITE='\033[37m'
 
-WORKDIR=`pwd`
+SERVICE_LIST="mysql phpmyadmin nginx wordpress ftps influxdb grafana telegraf"
 
-echo "$WORKDIR"
-echo "$USER"
+if [[ $1 = 'clean' ]] ; then
+	echo -ne "$_GREEN➜$_YELLOW	Cleaning all services...\n"
+	for SERVICE in $SERVICE_LIST ; do
+	# Delete a pod using the type and name specified in the pod.yaml file.
+		echo "-1-\n"
+	done
+	echo "-2-\n"
+	echo -ne "$_GREEN✓$_YELLOW	Clean complete !\n"
+	exit
+fi
