@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/05/29 14:36:57 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/03 19:35:47 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -196,10 +196,26 @@ mkdir -p $WORKDIR/$USER
 # Internet connection
 # Container or VirtualBox
 if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
+	# Starts a local Kubernetes cluster
+	# --cpus [int] Number of CPUs allocated to Kubernetes. (default 2)
+	# --memory [string] Amount of RAM to allocate to Kubernetes (format: <number>[<unit>], where unit = b, k, m or g).
+	# --vm-driver driver DEPRECATED, use driver instead.
+	# --extra-config ExtraOption A set of key=value pairs that describe configuration that may be passed to different components.
+    # The key should be '.' separated, and the first part before the dot is the component to apply the configuration to.
+    # Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
+    # Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
+	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
 	minikube start --cpus=2 --memory 4000 --vm-driver=virtualbox --extra-config=apiserver.service-node-port-range=1-35000
+	# Enable or disable a minikube addon
+	# Measuring Resource Usage
 	minikube addons enable metrics-server
 	minikube addons enable ingress
+	# Web interface for kubernetes
 	minikube addons enable dashboard
 fi
 
 MINIKUBE_IP=$(minikube ip)
+
+# To point your shell to minikube's docker-daemon.
+# -p, --profile string The name of the minikube VM being used. This can be set to allow having multiple instances of minikube independently. (default "minikube")
+eval $(minikube -p minikube docker-env)
