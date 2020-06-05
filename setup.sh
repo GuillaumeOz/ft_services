@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/05 14:39:23 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/05 18:35:24 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -241,3 +241,51 @@ docker build -t ftps_alpine srcs/ftps
 docker build -t grafana_alpine srcs/grafana
 echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 
+# Deploy services
+
+printf "$_GREEN✓$_YELLOW	Deploying services...\n"
+
+for SERVICE in $SERVICE_LIST
+do
+	apply_yaml $SERVICE
+done
+
+kubectl apply -f srcs/ingress.yaml > /dev/null
+
+# Import Wordpress database
+kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql -u root -e 'CREATE DATABASE wordpress;'
+kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql wordpress -u root < srcs/wordpress/files/wordpress-tmp.sql
+
+# Remove TMP files
+rm -rf srcs/ftps/scripts/start-tmp.sh
+rm -rf srcs/wordpress/files/wordpress-tmp.sql
+
+printf "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
+printf "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
+
+### Launch Dashboard
+# minikube dashboard
+
+### Test SSH
+# ssh admin@$(minikube ip) -p 4000
+
+### Crash Container
+# kubectl exec -it $(kubectl get pods | grep mysql | cut -d" " -f1) -- /bin/sh -c "kill 1"
+
+### Export/Import Files from containers
+# kubectl cp srcs/grafana/grafana.db default/$(kubectl get pods | grep grafana | cut -d" " -f1):/var/lib/grafana/grafana.db
+
+# ENV
+# Alpine Linux
+
+# API
+# 1 - WordPress
+# 2 - Nginx
+# 3 - FTPS
+# 4 - MariaDB (MySQL)
+# 5 - Grafana
+#     InfluxDB
+
+# Kubernetes Services
+# 1 - phpMyAdmin
+# 1 - Ingress Controller
