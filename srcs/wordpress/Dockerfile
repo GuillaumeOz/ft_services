@@ -6,13 +6,14 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/06 17:42:29 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/06 19:09:17 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/08 18:33:25 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM alpine:latest
 
 ENV APACHE_SERVER_PATH /var/www/localhost/htdocs
+ENV VERSION_WORDPRESS 5.4.1
 
 # Installing dependencies
 RUN apk add --no-cache --virtual .build-deps unzip
@@ -23,7 +24,7 @@ RUN mkdir -p /run/apache2 /run/httpd
 WORKDIR /scripts
 
 # Get and setup WordPress
-ADD https://wordpress.org/latest.zip ./
+ADD https://wordpress.org/${VERSION_WORDPRESS}.zip ./
 RUN unzip -q wordpress-${VERSION_WORDPRESS}.zip -d ./ && \
         rm -rf ${APACHE_SERVER_PATH} && \
         mv wordpress/ ${APACHE_SERVER_PATH} && \
@@ -33,12 +34,6 @@ RUN unzip -q wordpress-${VERSION_WORDPRESS}.zip -d ./ && \
             ${APACHE_SERVER_PATH}/readme.html && \
         chown -R apache:apache ${APACHE_SERVER_PATH} && \
         apk del .build-deps
-###
-RUN cd /tmp/ && wget https://wordpress.org/latest.tar.gz \
- && tar -C /var/www/localhost/ -xvf latest.tar.gz \
- && chown -R www-data:www-data /var/www/localhost/wordpress
-COPY srcs/wordpress/wp-config.php /var/www/localhost/wordpress
-###
 
 # Copy of the HTTPD startup script
 COPY scripts/start.sh start.sh

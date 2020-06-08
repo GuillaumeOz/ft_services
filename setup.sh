@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/05 18:35:24 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/08 13:09:00 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -243,7 +243,7 @@ echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 
 # Deploy services
 
-printf "$_GREEN✓$_YELLOW	Deploying services...\n"
+echo -ne "$_GREEN✓$_YELLOW	Deploying services...\n"
 
 for SERVICE in $SERVICE_LIST
 do
@@ -260,8 +260,8 @@ kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql wordpr
 rm -rf srcs/ftps/scripts/start-tmp.sh
 rm -rf srcs/wordpress/files/wordpress-tmp.sql
 
-printf "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
-printf "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
+echo -ne "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
+echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
 
 ### Launch Dashboard
 # minikube dashboard
