@@ -1,27 +1,25 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
+#    2testscript.sh                                     :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/06/08 18:35:08 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/11 17:14:58 by gozsertt         ###   ########.fr        #
+#    Created: 2020/06/09 14:12:44 by gozsertt          #+#    #+#              #
+#    Updated: 2020/06/09 15:25:32 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM alpine:latest
+# Colors
+_RED='\033[31m'
+_GREEN='\033[32m'
+_YELLOW='\033[33m'
 
-RUN apk update && \
-	apk add mysql mysql-client && \
-	addgroup mysql mysql && \
-	rm -rf /var/cache/apk/*
-
-COPY scripts/start.sh /bin/start.sh
-COPY files/my.cnf /etc/mysql/my.cnf
-
-VOLUME ["/var/lib/mysql"]
-
-EXPOSE 3306
-
-ENTRYPOINT ["/bin/start.sh"]
+tfile=`mktemp`
+printf "$tfile"
+cat << EOF > $tfile
+FLUSH PRIVILEGES;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD' WITH GRANT OPTION;
+EOF
+echo 'FLUSH PRIVILEGES;' >> $tfile
+cat $tfile

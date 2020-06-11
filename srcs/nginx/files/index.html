@@ -1,0 +1,72 @@
+<script language="Javascript">
+	document.addEventListener('click', function(event) {
+	  var target = event.target;
+	  if (target.tagName.toLowerCase() == 'a')
+	  {
+	      var port = target.getAttribute('href').match(/^:(\d+)(.*)/);
+	      if (port)
+	      {
+	         target.href = window.location.origin;
+	         target.port = port[1];
+	      }
+	  }
+	}, false);
+</script>
+
+<html>
+	<head>
+	    <title>ft_services by sdunckel</title>
+		<style type="text/css">
+			body {
+				background-color: #121212
+				}
+			#navbar {
+				margin:0 auto;
+				padding:5px 0;
+				text-align:center;
+				font-family: Helvetica, Geneva, Arial, SunSans-Regular, sans-serif;
+				font-size: 25px;
+				#navbar a:link{
+					display:inline-block;
+					margin-left:5px;
+					padding: 5px 10px;
+					text-decoration:none;
+					color: #AAAAAA;
+					font-size: 28px;
+					}
+				}
+			.parent {
+				margin-top: 50vh; /* poussé de la moitié de hauteur de viewport */
+  				transform: translateY(-50%); /* tiré de la moitié de sa propre hauteur */
+			}
+			a {
+			  color: #00ffff;
+			  text-decoration:none;
+			  padding:10px;
+			  margin-bottom:1px;
+			}
+			a:hover {
+			  color: #00fff0;
+			}
+			h1 {
+				font-family: Helvetica, Geneva, Arial, SunSans-Regular, sans-serif;
+				color: #00ffff;
+				font-size: 45px;
+				}
+		</style>
+	</head>
+
+	<body>
+		<center>
+		<div class="parent">
+			<h1>ft_services by sdunckel</h1>
+			<br>
+			<ul id="navbar">
+				<a target="_blank" rel="noopener noreferrer" href=":5050">Wordpress</a> |
+				<a target="_blank" rel="noopener noreferrer" href=":5000">Phpmyadmin</a> |
+				<a target="_blank" rel="noopener noreferrer" href=":3000">Grafana</a>
+			</ul>
+		</div>
+		</center>
+	</body>
+</html>

@@ -6,11 +6,9 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/08 13:09:00 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/09 14:16:39 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
-#!/bin/bash
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

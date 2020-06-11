@@ -1,27 +1,19 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
+#    start.sh                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/06/08 18:35:08 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/11 17:14:58 by gozsertt         ###   ########.fr        #
+#    Created: 2020/06/11 17:15:09 by gozsertt          #+#    #+#              #
+#    Updated: 2020/06/11 17:16:27 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM alpine:latest
+#!/bin/sh
 
-RUN apk update && \
-	apk add mysql mysql-client && \
-	addgroup mysql mysql && \
-	rm -rf /var/cache/apk/*
+adduser -D "$SSH_USER"
+echo "$SSH_USER:$SSH_PASSWORD" | chpasswd
 
-COPY scripts/start.sh /bin/start.sh
-COPY files/my.cnf /etc/mysql/my.cnf
-
-VOLUME ["/var/lib/mysql"]
-
-EXPOSE 3306
-
-ENTRYPOINT ["/bin/start.sh"]
+/usr/sbin/sshd
+/usr/sbin/nginx -g 'daemon off;'
