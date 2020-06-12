@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/11 15:55:02 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/11 17:50:49 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/12 14:20:02 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,5 +30,5 @@ COPY files/ssh_host_rsa_key /etc/ssh
 RUN chmod 600 /etc/ssh/ssh_host_*
 
 EXPOSE 4000 80 443
-#Check the entrypoint success
+#Check the entrypoint success command
 ENTRYPOINT sh /start.sh
