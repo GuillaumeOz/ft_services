@@ -1,24 +1,68 @@
-# apiVersion - Which version of the Kubernetes API you’re using to create this object
-# kind - What kind of object you want to create
-# metadata - Data that helps uniquely identify the object, including a name string, UID, and optional namespace
-# spec - What state you desire for the object
-
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: mysql
+  labels:
+    app: mysql
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: nginx
-  replicas: 2 # tells deployment to run 2 pods matching the template
+      app: mysql
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
-        app: nginx
+        app: mysql
     spec:
+      restartPolicy: Always
       containers:
-      - name: nginx
-        image: nginx:1.14.2
+      - image: mysql_alpine
+        imagePullPolicy: Never
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_DATABASE
+          value: wordpress
+        - name: MYSQL_USER
+          value: root
+        - name: MYSQL_PASSWORD
+          value: password
         ports:
-        - containerPort: 80
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim

@@ -1,0 +1,11 @@
+# Kubernetes Object Reference
+
+<span style="color:cornflowerBlue">apiVersion:<span style="color:chocolate"> v1</span></span>
+
+# APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+# apiVersion - Which version of the Kubernetes API you’re using to create this object
+apiVersion: v1
+
+# kind - What kind of object you want to create
+# metadata - Data that helps uniquely identify the object, including a name string, UID, and optional namespace
+# spec - What state you desire for the object

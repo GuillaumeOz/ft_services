@@ -36,7 +36,12 @@ This distribution is particularly suitable, due to its lightness, for the creati
 
 **Kubernetes** is a portable, extensible, open-source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.  
 [More details here](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/)  Or [Here](https://medium.com/@tsuyoshiushio/kubernetes-in-three-diagrams-6aba8432541c).  
-  
+
+**Kubernetes resource objects** is a high-level overview of the basic types of resources provide by the Kubernetes API and their primary functions.  
+For a better understanding of Kubernetes Object Management, you'll find [More informations here](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/).  
+This link will be helpful for create your own **YAML files**.  
+<span style="color:cornflowerBlue">apiVersion: <span style="color:chocolate"> v1</span></span>
+
 **Minikube** is a tool to facilitate the local execution of Kubernetes. Minikube runs a single-node Kubernetes cluster in a virtual machine (VM) on your laptop.  
 [More details here](https://kubernetes.io/docs/tutorials/hello-minikube/).
 
