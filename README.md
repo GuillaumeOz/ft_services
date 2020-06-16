@@ -40,6 +40,7 @@ This distribution is particularly suitable, due to its lightness, for the creati
 **Kubernetes resource objects** is a high-level overview of the basic types of resources provide by the Kubernetes API and their primary functions.  
 For a better understanding of Kubernetes Object Management, you'll find [More informations here](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/).  
 This link will be helpful for create your own **YAML files**.  
+Check the kubernetes objects usage of this project [here]().
 
 **Minikube** is a tool to facilitate the local execution of Kubernetes. Minikube runs a single-node Kubernetes cluster in a virtual machine (VM) on your laptop.  
 [More details here](https://kubernetes.io/docs/tutorials/hello-minikube/).
