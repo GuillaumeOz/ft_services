@@ -1,5 +1,9 @@
 # Kubernetes Object Reference
 
+<div class="text-purple">
+  This text is purple, <a href="#" class="text-inherit">including the link</a>
+</div>
+
 <span style="color:cornflowerBlue">apiVersion:<span style="color:chocolate"> v1</span></span>
 
 <div class="yaml_color_syntax">
