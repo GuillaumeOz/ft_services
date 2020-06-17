@@ -42,7 +42,6 @@ spec:
       labels:
         app: mysql
     spec:
-      XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       restartPolicy: Always
       containers:
       - image: mysql_alpine
