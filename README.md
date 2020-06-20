@@ -6,7 +6,7 @@ The purpose of this project is to use Kubernetes to virtualize a network and set
 ## Introduction
 
 <p align="center">
-  <img src="assets/Kubernetes Diagram.jpg" alt="demo img" width="800" />
+  <img src="assets/schema_ft_services.jpg" alt="demo img" width="800" />
 </p>
 
 For learning purposes only, **not intended for production**.
