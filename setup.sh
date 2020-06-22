@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/09 14:16:39 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/22 18:33:38 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,12 @@
 # 	echo -ne "\033[1;32m+>\033[0;33m Update brew... ! \n"
 #     brew update &> /dev/null
 # fi
-
+#
+#mode actif et le mode passif du FTP, avec la problématique d'ouvrir un port etc
+#Tu dois faire des dump/import SQL, comprendre a minima ce qu'est nginx, comment faire fonctionner des pages php
+#Trouver une solution pour collecter les métrics et la mettre en place...
+#Et pleins d'autres choses encore
+#Donc personnellement je considère qu'on peut se permettre de prendre des images toute faite quand on sait comment les services fonctionnent, comment les installer etc (sans dire d'être au niveau de maîtrise des images officielles)
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # Colors
@@ -277,13 +282,14 @@ echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_
 # Alpine Linux
 
 # API
-# 1 - WordPress
-# 2 - Nginx
-# 3 - FTPS
-# 4 - MariaDB (MySQL)
-# 5 - Grafana
+# 1 - Nginx
+# 2 - FTPS
+# 3 - WordPress
+# 4 - phpMyAdmin
+# 5 - MariaDB (MySQL)
+# 6 - Grafana
 #     InfluxDB
 
 # Kubernetes Services
-# 1 - phpMyAdmin
-# 1 - Ingress Controller
+# 1 - Telegraf 
+# 2 - Ingress Controller

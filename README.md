@@ -88,6 +88,13 @@ WordPress requires MySQL to store and retrieve all of its data including post co
 **InfluxDB** is an open-source time series database(TSDB) developed by InfluxData. It is written in Go and optimized for fast, high-availability storage and retrieval of time series data in fields such as operations monitoring, application metrics, Internet of Things sensor data, and real-time analytics. It also has support for processing data from Graphite.
 In our project, InfluxDB will stock the necessairy data for running Grafana application.
 
+### Telegraf
+
+**Telegraf** is a metric collection agent, only one agent is required per VM. This agent knows how to collect metrics exposed in Prometheus format and offers two methods of retrieving metrics, via:
+
+**push** : the metric is pushed into Telegraf by the component that exposes it
+**pull** : Telegraf retrieves the metric by interrogating the component that exposes it (the most used mode)3
+
 ## Usage
 
 The setup script check if : ```Docker```, ```VirtualBox```, ```minikube``` and ```kubectl``` are installed.
@@ -122,10 +129,10 @@ Use ```Filezilla``` and connect with ```admin:admin``` on port 21
 * ```FTPS``` on port 21
 * ```MySQL``` on port 3306
 * ```Wordpress``` on port 5050
-* ```Phpmyadmin``` on port 5050
+* ```Phpmyadmin``` on port 5000
 * ```Grafana``` on port 3000
 * ```InfluxDB``` on port 8086
-* ```Nginx``` on port 80, 443 (SSL) and 4000 (SSH)
+* ```Nginx``` on port 80(HTTP), 443 (SSL) and 4000 (SSH)
 
 ### Acknowledgements
 

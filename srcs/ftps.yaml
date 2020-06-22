@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ftps
+  labels:
+    app: ftps
+spec:
+  ports:
+    - port: 21
+      name: ftps
+    - port: 21000
+      name: ftps-data
+  selector:
+    app: ftps
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ftps-pv-claim
+  labels:
+    app: ftps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: ftps
+  labels:
+    app: ftps
+spec:
+  selector:
+    matchLabels:
+      app: ftps
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: ftps
+    spec:
+      containers:
+      - image: ftps_alpine
+        imagePullPolicy: Never
+        name: ftps
+        env:
+        - name: FTP_USER
+          value: admin
+        - name: FTP_PASSWORD
+          value: admin
+        ports:
+        - containerPort: 21
+          hostPort: 21
+        - containerPort: 21000
+          hostPort: 21000
+        volumeMounts:
+        - name: ftps-persistent-storage
+          mountPath: /ftps
+      volumes:
+      - name: ftps-persistent-storage
+        persistentVolumeClaim:
+          claimName: ftps-pv-claim
