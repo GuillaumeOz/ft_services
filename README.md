@@ -117,7 +117,7 @@ If not the script installs it for you.
 * SSH :
 
 ```shell
-ssh admin@$(minikube ip) -p 4000
+ssh admin@$(minikube ip) -p 22
 ```
 
 * FTPS :
@@ -132,7 +132,7 @@ Use ```Filezilla``` and connect with ```admin:admin``` on port 21
 * ```Phpmyadmin``` on port 5000
 * ```Grafana``` on port 3000
 * ```InfluxDB``` on port 8086
-* ```Nginx``` on port 80(HTTP), 443 (SSL) and 4000 (SSH)
+* ```Nginx``` on port 80(HTTP), 443 (SSL) and 22 (SSH)
 
 ### Acknowledgements
 
