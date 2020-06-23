@@ -6,32 +6,11 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/22 18:33:38 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/23 12:31:14 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-#-----------------------Install Brew------------------------------#
-
-# Brew is installed ? : (if its neccessary... then redo this part)
-# 	- no : Install it
-# 	- yes : Check for update
-# which brew > /dev/null
-# if [[ $? != 0 ]] ; then
-#     echo -ne "\033[1;31m+>\033[0;33m Install brew... \n"
-#     rm -rf $HOME/.brew && git clone --depth=1 https://github.com/Homebrew/brew $HOME/.brew && export PATH=$HOME/.brew/bin:$PATH && brew update && echo "export PATH=$HOME/.brew/bin:$PATH" >> ~/.zshrc &> /dev/null
-# else
-# 	echo -ne "\033[1;32m+>\033[0;33m Update brew... ! \n"
-#     brew update &> /dev/null
-# fi
-#
-#mode actif et le mode passif du FTP, avec la problématique d'ouvrir un port etc
-#Tu dois faire des dump/import SQL, comprendre a minima ce qu'est nginx, comment faire fonctionner des pages php
-#Trouver une solution pour collecter les métrics et la mettre en place...
-#Et pleins d'autres choses encore
-#Donc personnellement je considère qu'on peut se permettre de prendre des images toute faite quand on sait comment les services fonctionnent, comment les installer etc (sans dire d'être au niveau de maîtrise des images officielles)
-#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+#!/bin/bash
 
 # Colors
 _BLACK='\033[30m'
@@ -110,32 +89,19 @@ echo -e 	"\n\n $_WHITE
 																				  \n\n"
 sleep 0.5
 
-# TODO
-# Enable Sudo mode for all commands.
-
 #---------------------Virtualisation Mode---------------------------#
-# Checking if te virtualisation is on for minikube || check if its work on the vm without this ||
-grep -Eq 'vmx|svm' /proc/cpuinfo
-if [ $? != 0 ]; then
-	echo -ne "$_RED➜$_WHITE Please activate the virtualisation on your Virtual Machine and restart the script.\n"
-	exit
-fi
+# Checking if te virtualisation is on for minikube
+# Activate this part if necessary
+
+# grep -Eq 'vmx|svm' /proc/cpuinfo
+# if [ $? != 0 ]; then
+# 	echo -ne "$_RED➜$_WHITE Please activate the virtualisation on your Virtual Machine and restart the script.\n"
+# 	exit
+# fi
 
 #----------------------------Sudo Mode------------------------------#
-sudo usermod -aG sudo $USER > /dev/null #Check is there are any probs on VM
 
-# if [[ $? != 0 ]] ; then
-# 	echo -ne "$_RED➜$_YELLOW Insecure completion-dependent directories detected: \n"
-# 	echo -ne "$_GREEN➜$_YELLOW Fixing your permissions... \n"
-# 	compaudit | xargs chmod g-w,o-w
-# 	sudo -s > /dev/null
-# 	if [[ $? != 0 ]] ; then
-# 		echo -ne "$_RED➜$_YELLOW We cannot load your permissions from these directories: \n"
-# 		sudo -s | grep "$USER"
-# 		echo -ne "\n$_RED➜$_YELLOW Please fix your permissions and restart the script.\n"
-# 		exit
-# 	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
-# fi
+sudo usermod -aG sudo $USER > /dev/null
 
 #------------------------Update Packages----------------------------#
 
@@ -188,7 +154,8 @@ fi
 [ -z "${WORKDIR}" ] && WORKDIR=`pwd`
 mkdir -p $WORKDIR/$USER
 # Set the minikube directory in current folder
-# export MINIKUBE_HOME="/goinfre/$USER"# Its is necessary ?
+# Enable this command if you run the projet at 42
+# export MINIKUBE_HOME="/goinfre/$USER"
 
 #-------------------Start Minikube------------------#
 # Start the cluster if it's not running
@@ -242,11 +209,11 @@ docker build -t wordpress_alpine srcs/wordpress
 docker build -t nginx_alpine srcs/nginx
 docker build -t ftps_alpine srcs/ftps
 docker build -t grafana_alpine srcs/grafana
-echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
+echo -ne "$_GREEN✓$_YELLOW	$@ deployed !\n"
 
 # Deploy services
 
-echo -ne "$_GREEN✓$_YELLOW	Deploying services...\n"
+echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
 
 for SERVICE in $SERVICE_LIST
 do
