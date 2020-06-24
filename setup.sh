@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/24 11:25:04 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/24 11:34:18 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,6 +55,7 @@ function apply_yaml()
 	# Create a service using the definition in example-service.yaml.
 	kubectl apply -f srcs/$@.yaml > /dev/null
 	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
+	echo -ne "$_NOCOLOR"
 	sleep 2;
 	# kubectl [command] [TYPE] [NAME] [flags]
 	# [command] = get
@@ -206,13 +207,13 @@ sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/ftps/scripts/start-tmp.sh
 
 # Build Docker images
 
-echo -ne "$_GREEN➜$_YELLOW	Building Docker images...\n"
+echo -ne "$_GREEN➜$_YELLOW Building Docker images...\n"
 docker build -t mysql_alpine srcs/mysql
 docker build -t wordpress_alpine srcs/wordpress
 docker build -t nginx_alpine srcs/nginx
 docker build -t ftps_alpine srcs/ftps
 docker build -t grafana_alpine srcs/grafana
-echo -ne "$_GREEN✓$_YELLOW	$@ deployed !\n"
+echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
 
 # Deploy services
 
