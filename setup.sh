@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/24 11:34:18 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/24 12:00:07 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -178,7 +178,7 @@ if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
     # Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
     # Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
 	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
-	minikube start --cpus=2 --memory 4000 --driver=VirtualBox --extra-config=apiserver.service-node-port-range=1-35000
+	minikube start --cpus=2 --memory 4000 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
 	# Enable or disable a minikube addon
 	# Measuring Resource Usage
 	minikube addons enable metrics-server
@@ -218,6 +218,7 @@ echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
 # Deploy services
 
 echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
+echo -ne "$_NOCOLOR"
 
 for SERVICE in $SERVICE_LIST
 do
