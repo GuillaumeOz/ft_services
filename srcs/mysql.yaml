@@ -12,20 +12,6 @@ spec:
   clusterIP: None
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv
-  labels:
-    app : mysql
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: "/data/mysql/"
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
@@ -56,7 +42,7 @@ spec:
       labels:
         app: mysql
     spec:
-      restartPolicy: Always
+      restartPolicy: Always 
       containers:
       - image: mysql_alpine
         imagePullPolicy: Never
