@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/23 12:31:14 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/24 11:25:04 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,7 @@ _BLUE='\033[34m'
 _PURPLE='\033[35m'
 _CYAN='\033[36m'
 _WHITE='\033[37m'
+_NOCOLOR='\033[0m'
 
 # Variables
 
@@ -92,6 +93,7 @@ sleep 0.5
 #---------------------Virtualisation Mode---------------------------#
 # Checking if te virtualisation is on for minikube
 # Activate this part if necessary
+# If you run the flags --driver=docker within a VM, virtualization is not necessery
 
 # grep -Eq 'vmx|svm' /proc/cpuinfo
 # if [ $? != 0 ]; then
@@ -175,7 +177,7 @@ if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
     # Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
     # Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
 	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
-	minikube start --cpus=2 --memory 4000 --vm-driver=virtualbox --extra-config=apiserver.service-node-port-range=1-35000
+	minikube start --cpus=2 --memory 4000 --driver=VirtualBox --extra-config=apiserver.service-node-port-range=1-35000
 	# Enable or disable a minikube addon
 	# Measuring Resource Usage
 	minikube addons enable metrics-server
@@ -190,16 +192,17 @@ MINIKUBE_IP=$(minikube ip)
 
 # To point your shell to minikube's docker-daemon.
 # eval — construct command by concatenating arguments
-# -p, --profile string The name of the minikube VM being used. This can be set to allow having multiple instances of minikube independently. (default "minikube")
+# -p, --profile string The name of the minikube VM being used.
+# This can be set to allow having multiple instances of minikube independently. (default "minikube")
 # docker-env Configure environment to use minikube’s Docker daemon
 eval $(minikube -p minikube docker-env)
 
-# MINIKUBE_IP EDIT
+# MINIKUBE_IP EDIT IN WORDPRESS SQL
 
 cp srcs/wordpress/files/wordpress.sql srcs/wordpress/files/wordpress-tmp.sql
-sed -i '' "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/wordpress/files/wordpress-tmp.sql
+sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/wordpress/files/wordpress-tmp.sql
 cp srcs/ftps/scripts/start.sh srcs/ftps/scripts/start-tmp.sh
-sed -i '' "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/ftps/scripts/start-tmp.sh
+sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/ftps/scripts/start-tmp.sh
 
 # Build Docker images
 

@@ -2,7 +2,7 @@
 -- version 5.0.1
 -- https://www.phpmyadmin.net/
 --
--- Host: mysql:3306
+-- Host: mysql:
 -- Generation Time: Jan 21, 2020 at 11:05 AM
 -- Server version: 10.4.10-MariaDB-log
 -- PHP Version: 7.4.1
