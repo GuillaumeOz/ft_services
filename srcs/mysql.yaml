@@ -3,24 +3,21 @@ kind: Service
 metadata:
   name: mysql
   labels:
-    app: ft_services
+    app: mysql
 spec:
-  type: ClusterIP
   ports:
-  - port: 3306
+    - port: 3306
   selector:
-    app: ft_services
-    tier: mysql
-
+    app: mysql
+  clusterIP: None
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mysql-pv
   labels:
-    type: local
+    app : mysql
 spec:
-  storageClassName: mysql-db
   accessModes:
     - ReadWriteOnce
   capacity:
@@ -33,56 +30,52 @@ kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
   labels:
-    app: ft_services
+    app: mysql
 spec:
-  storageClassName: mysql-db
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: mysql-deployment
+  name: mysql
   labels:
-    app: ft_services
+    app: mysql
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: ft_services
-      tier: mysql
+      app: mysql
   strategy:
     type: Recreate
-  replicas: 1
   template:
     metadata:
       labels:
-        app: ft_services
-        tier: mysql
+        app: mysql
     spec:
       restartPolicy: Always
       containers:
-      - name: mysql
-        image: my-mysql
+      - image: mysql_alpine
         imagePullPolicy: Never
+        name: mysql
         env:
-        - name: MYSQL_ROOT
-          valueFrom:
-            secretKeyRef:
-              name: mysql
-              key: username
         - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql
-              key: password
+          value: password
+        - name: MYSQL_DATABASE
+          value: wordpress
+        - name: MYSQL_USER
+          value: root
+        - name: MYSQL_PASSWORD
+          value: password
         ports:
         - containerPort: 3306
+          name: mysql
         volumeMounts:
         - name: mysql-persistent-storage
-          mountPath: "/data/mysql"
+          mountPath: /var/lib/mysql
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
