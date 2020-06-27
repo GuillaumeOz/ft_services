@@ -6,14 +6,15 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/06 17:42:29 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/11 15:55:47 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/06/26 17:11:43 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM alpine:latest
 
+ENV TIMEZONE Europe/Paris
+ENV VERSION_WORDPRESS 4.9.6
 ENV APACHE_SERVER_PATH /var/www/localhost/htdocs
-ENV VERSION_WORDPRESS 5.4.1
 
 # Installing dependencies
 RUN apk add --no-cache --virtual .build-deps unzip
@@ -23,8 +24,8 @@ RUN mkdir -p /run/apache2 /run/httpd
 # Work path
 WORKDIR /scripts
 
-# Get and setup WordPress
-ADD https://wordpress.org/${VERSION_WORDPRESS}.zip ./
+# Download & install wordpress
+ADD https://wordpress.org/wordpress-${VERSION_WORDPRESS}.zip ./
 RUN unzip -q wordpress-${VERSION_WORDPRESS}.zip -d ./ && \
         rm -rf ${APACHE_SERVER_PATH} && \
         mv wordpress/ ${APACHE_SERVER_PATH} && \
