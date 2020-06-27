@@ -42,7 +42,7 @@ spec:
       labels:
         app: mysql
     spec:
-      restartPolicy: Always
+      restartPolicy: Always 
       containers:
       - image: mysql_alpine
         imagePullPolicy: Never
