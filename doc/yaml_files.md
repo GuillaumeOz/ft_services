@@ -18,6 +18,13 @@ kind - What kind of object you want to create.
 Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase.  
 [More info here](https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds).
 
+**The StorageClass Resource**
+
+Each StorageClass contains the fields `provisioner`, `parameters`, and `reclaimPolicy`, which are used when a PersistentVolume belonging to the class needs to be dynamically provisioned.
+
+The name of a StorageClass object is significant, and is how users can request a particular class. Administrators set the name and other parameters of a class when first creating StorageClass objects, and the objects cannot be updated once they are created.
+
+Administrators can specify a default StorageClass just for PVCs that don't request any particular class to bind to: see the [PersistentVolumeClaim section](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims) for details.
 
 `metadata: ObjectMeta`
 

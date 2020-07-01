@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/26 14:37:38 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/01 16:06:25 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -179,7 +179,8 @@ if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
     # Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
 	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
 	# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
-	minikube start --cpus=2 --memory 2048 --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-35000
+	# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
+	minikube start --cpus=2 --memory 2048 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
 	# Enable or disable a minikube addon
 	# Measuring Resource Usage
 	minikube addons enable metrics-server
@@ -197,7 +198,8 @@ MINIKUBE_IP=$(minikube ip)
 # -p, --profile string The name of the minikube VM being used.
 # This can be set to allow having multiple instances of minikube independently. (default "minikube")
 # docker-env Configure environment to use minikube’s Docker daemon
-eval $(minikube -p minikube docker-env)
+# set the environment variable with eval command
+eval $(minikube docker-env)
 
 # MINIKUBE_IP EDIT IN WORDPRESS SQL
 

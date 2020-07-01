@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    start.sh                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/06/08 14:09:55 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/08 19:07:02 by gozsertt         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 #!/bin/sh
 
 # Start (ensure apache2 PID not left behind first) to stop auto start crashes if didn't shut down properly
