@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/02 14:12:09 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/02 15:30:49 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -199,7 +199,7 @@ MINIKUBE_IP=$(minikube ip)
 # This can be set to allow having multiple instances of minikube independently. (default "minikube")
 # docker-env Configure environment to use minikube’s Docker daemon
 # set the environment variable with eval command
-eval $(minikube docker-env)
+eval $(minikube -p minikube docker-env)
 
 # MINIKUBE_IP EDIT IN WORDPRESS SQL
 
