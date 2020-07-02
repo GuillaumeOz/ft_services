@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/06/11 15:55:02 by gozsertt          #+#    #+#              #
-#    Updated: 2020/06/26 18:16:03 by gozsertt         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 FROM nginx:alpine
 
 RUN apk upgrade --update-cache --available && \
@@ -29,6 +17,6 @@ COPY files/ssh_host_rsa_key /etc/ssh
 
 RUN chmod 600 /etc/ssh/ssh_host_*
 
-EXPOSE 4000 80 443
+EXPOSE 22 80 443
 #Check the entrypoint success command
 ENTRYPOINT sh /start.sh

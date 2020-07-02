@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/01 16:06:25 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/02 14:12:09 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -245,7 +245,7 @@ echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_
 # minikube dashboard
 
 ### Test SSH
-# ssh admin@$(minikube ip) -p 4000
+# ssh admin@$(minikube ip) -p 22
 
 ### Crash Container
 # kubectl exec -it $(kubectl get pods | grep mysql | cut -d" " -f1) -- /bin/sh -c "kill 1"
