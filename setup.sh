@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/02 15:30:49 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/03 12:22:09 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -180,7 +180,7 @@ if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
 	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
 	# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
 	# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
-	minikube start --cpus=2 --memory 2048 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
+	minikube start --cpus=2 --memory 4000 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
 	# Enable or disable a minikube addon
 	# Measuring Resource Usage
 	minikube addons enable metrics-server
