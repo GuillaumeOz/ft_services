@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/06 07:02:59 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/06 07:18:30 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -127,6 +127,7 @@ fi
 
 #------------------Install Minikube------------------------------#
 
+sudo mkdir -p /usr/local/bin/
 sudo rm -rf /usr/local/bin/minikube
 which minikube > /dev/null
 if [[ $? != 0 ]] ; then
@@ -134,13 +135,13 @@ if [[ $? != 0 ]] ; then
 	PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
 	install_packages $PACKAGES
 	chmod +x minikube
-	sudo mkdir -p /usr/local/bin/
 	sudo install minikube /usr/local/bin/
 	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 fi
 
 #------------------Install Kubectl------------------#
 
+sudo rm -rf /usr/local/bin/kubectl
 kubectl version --client > /dev/null
 if [[ $? != 0 ]] ; then
 	echo -ne "$_GREEN➜$_YELLOW Install Kubectl... \n"
@@ -148,7 +149,6 @@ if [[ $? != 0 ]] ; then
 	install_packages $PACKAGES
 	chmod +x ./kubectl
 	sudo mv ./kubectl /usr/local/bin/kubectl
-	sudo install minikube /usr/local/bin/
 	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 fi
 
