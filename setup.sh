@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/06 07:02:08 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/06 07:02:59 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -142,7 +142,7 @@ fi
 #------------------Install Kubectl------------------#
 
 kubectl version --client > /dev/null
-if [[ $? == 0 ]] ; then
+if [[ $? != 0 ]] ; then
 	echo -ne "$_GREEN➜$_YELLOW Install Kubectl... \n"
 	PACKAGES="curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl"
 	install_packages $PACKAGES
