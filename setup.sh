@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/06 07:25:39 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/06 09:35:13 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -125,32 +125,26 @@ if [[ $? != 0 ]] ; then
 	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 fi
 
-#------------------Install Minikube------------------------------#
-
-sudo mkdir -p /usr/local/bin/
-sudo rm -rf /usr/local/bin/minikube
-which minikube > /dev/null
-if [[ $? != 0 ]] ; then
-	echo -ne "$_GREEN➜$_YELLOW Install Minikube... \n"
-	PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/1.10.1/minikube-linux-amd64"
-	install_packages $PACKAGES
-	chmod +x minikube
-	sudo install minikube /usr/local/bin/
-	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
-fi
-
 #------------------Install Kubectl------------------#
 
 sudo rm -rf /usr/local/bin/kubectl
-kubectl version --client > /dev/null
-if [[ $? != 0 ]] ; then
-	echo -ne "$_GREEN➜$_YELLOW Install Kubectl... \n"
-	PACKAGES="curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl"
-	install_packages $PACKAGES
-	chmod +x ./kubectl
-	sudo mv ./kubectl /usr/local/bin/kubectl
-	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
-fi
+echo -ne "$_GREEN➜$_YELLOW Install Kubectl... \n"
+PACKAGES="curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+install_packages $PACKAGES
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+
+#------------------Install Minikube------------------------------#
+
+sudo rm -rf /usr/local/bin/minikube
+which minikube > /dev/null
+echo -ne "$_GREEN➜$_YELLOW Install Minikube... \n"
+PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+install_packages $PACKAGES
+chmod +x minikube
+sudo cp minikube /usr/local/bin && rm minikube
+echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 
 #-----------------Env Configuration-----------------#
 # Ensure USER variabe is set
@@ -181,7 +175,7 @@ if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
 	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
 	# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
 	# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
-	minikube start --kubernetes-version v1.10.1 --cpus=2 --memory 4000 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
+	minikube start --cpus=2 --memory 4000 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
 	# Enable or disable a minikube addon
 	# Measuring Resource Usage
 	minikube addons enable metrics-server
