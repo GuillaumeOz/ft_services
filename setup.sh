@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/06 07:18:30 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/06 07:25:39 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -132,7 +132,7 @@ sudo rm -rf /usr/local/bin/minikube
 which minikube > /dev/null
 if [[ $? != 0 ]] ; then
 	echo -ne "$_GREEN➜$_YELLOW Install Minikube... \n"
-	PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+	PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/1.10.1/minikube-linux-amd64"
 	install_packages $PACKAGES
 	chmod +x minikube
 	sudo install minikube /usr/local/bin/
