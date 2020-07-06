@@ -5,10 +5,10 @@ metadata:
 spec:
   ports:
     - port: 80
-      nodePort: 5000
+      targetPort: 5000
   selector:
     app: phpmyadmin
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment

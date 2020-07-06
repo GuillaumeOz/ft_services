@@ -329,10 +329,10 @@ metadata:
     name: grafana
   name: grafana
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - port: 3000
-    nodePort: 3000
+    targetPort: 3000
   selector:
     app: grafana
 ---

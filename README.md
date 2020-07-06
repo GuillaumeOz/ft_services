@@ -128,7 +128,7 @@ Use ```Filezilla``` and connect with ```admin:admin``` on port 21
 * ```MySQL``` on port 3306
 * ```Wordpress``` on port 5050
 * ```Phpmyadmin``` on port 5000
-* ```Grafana``` on port 3000 
+* ```Grafana``` on port 3000
 * ```InfluxDB``` on port 8086
 * ```Nginx``` on port 80(HTTP), 443 (SSL) and 22 (SSH)
 
