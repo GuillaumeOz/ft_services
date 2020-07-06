@@ -11,7 +11,7 @@ spec:
     nodePort: 8086
   selector:
     app: influxdb
-  type: NodePort
+  type: None
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

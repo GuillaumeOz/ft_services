@@ -11,7 +11,7 @@ spec:
       nodePort: 5050
   selector:
     app: wordpress
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

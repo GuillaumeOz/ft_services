@@ -16,7 +16,7 @@ For learning purposes only, **not intended for production**.
 * Alpine Linux
 * Kubernetes
 * Docker
-* Ingress Controller
+* MetalLB
 * Nginx
 * FTPS
 * WordPress
@@ -49,11 +49,9 @@ Check the kubernetes objects usage of this project [here]().
 
 **Nginx** is open source software for web serving, reverse proxying, caching, load balancing, media streaming, and more. It started out as a web server designed for maximum performance and stability. In addition to its HTTP server capabilities, NGINX can also function as a proxy server for email (IMAP, POP3, and SMTP) and a reverse proxy and load balancer for HTTP, TCP, and UDP servers.
 
-### Kubernetes Ingress
+### MetalLB, an ** MetalLB allows access to your Kubernetes services from outside the Kubernetes cluster. You configure access by creating a collection of rules that define which inbound connections reach which services.
 
-In Kubernetes, an **Ingress** is an object that allows access to your Kubernetes services from outside the Kubernetes cluster. You configure access by creating a collection of rules that define which inbound connections reach which services.
-
-if you have difficulty to understand the **interaction between Kubernetes Ingress and NGINX**, please look at this [link](https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html).
+if you have difficulty to understand the **interaction between Kubernetes MetalLB**, please look at this [link](https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html).
 
 ### Docker
 
@@ -130,7 +128,7 @@ Use ```Filezilla``` and connect with ```admin:admin``` on port 21
 * ```MySQL``` on port 3306
 * ```Wordpress``` on port 5050
 * ```Phpmyadmin``` on port 5000
-* ```Grafana``` on port 3000
+* ```Grafana``` on port 3000 
 * ```InfluxDB``` on port 8086
 * ```Nginx``` on port 80(HTTP), 443 (SSL) and 22 (SSH)
 

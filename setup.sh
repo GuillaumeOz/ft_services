@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/03 12:22:09 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/06 05:11:26 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -184,8 +184,8 @@ if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
 	# Enable or disable a minikube addon
 	# Measuring Resource Usage
 	minikube addons enable metrics-server
-	minikube addons enable ingress
 	# Web interface for kubernetes
+	minikube addons enable metallb
 	minikube addons enable dashboard
 fi
 
@@ -223,12 +223,12 @@ echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
 echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
 echo -ne "$_NOCOLOR"
 
+kubectl apply -f srcs/metallb.yaml > /dev/null
+
 for SERVICE in $SERVICE_LIST
 do
 	apply_yaml $SERVICE
 done
-
-kubectl apply -f srcs/ingress.yaml > /dev/null
 
 # Import Wordpress database
 kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql -u root -e 'CREATE DATABASE wordpress;'
@@ -264,7 +264,4 @@ echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_
 # 5 - MariaDB (MySQL)
 # 6 - Grafana
 #     InfluxDB
-
-# Kubernetes Services
-# 1 - Telegraf 
-# 2 - Ingress Controller
+#     Telegraf

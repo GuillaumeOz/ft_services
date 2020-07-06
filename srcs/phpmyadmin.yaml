@@ -8,7 +8,7 @@ spec:
       nodePort: 5000
   selector:
     app: phpmyadmin
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
