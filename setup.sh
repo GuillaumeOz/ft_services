@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/06 09:35:13 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/06 20:49:34 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -75,7 +75,7 @@ if [[ $1 = 'clean' ]] ; then
 	# Delete a pod using the type and name specified in the pod.yaml file.
 		kubectl delete -f srcs/$SERVICE.yaml > /dev/null
 	done
-	kubectl delete -f srcs/ingress.yaml > /dev/null
+	kubectl delete -f srcs/metallb.yaml > /dev/null
 	echo -ne "$_GREEN✓$_YELLOW	Clean complete !\n"
 	exit
 fi
@@ -150,7 +150,6 @@ echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 # Ensure USER variabe is set
 [ -z "${USER}" ] && export USER=`whoami`
 [ -z "${WORKDIR}" ] && WORKDIR=`pwd`
-mkdir -p $WORKDIR/$USER
 # Set the minikube directory in current folder
 # Enable this command if you run the projet at 42
 # export MINIKUBE_HOME="/goinfre/$USER"

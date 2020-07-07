@@ -7,11 +7,9 @@ metadata:
 spec:
   ports:
   - port: 8086
-    targetPort: 8086
-    nodePort: 8086
   selector:
     app: influxdb
-  type: None
+  clusterIP: None
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
