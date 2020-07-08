@@ -1,35 +1,38 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: nginx
   labels:
+    run: nginx
     app: nginx
 spec:
-  selector:
-    app: nginx
   ports:
     - name: http
       port: 80
       targetPort: 80
       protocol: TCP
+  selector:
+    run: nginx
+    app: nginx
 ---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: nginx-service
   labels:
-    app: nginx
+    run: nginx-service
+    app: nginx-service
 spec:
-  type: LoadBalancer
-  selector:
-    app: nginx
   ports:
+    - name: ssh
+      port: 22
+      targetPort: 22
     - name: https
       targetPort: 443
       port: 443
-    - name: ssh
-      targetPort: 22
-      port: 22
+  selector:
+    run: nginx-service
+    app: nginx-service
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment

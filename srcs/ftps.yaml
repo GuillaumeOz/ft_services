@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: ftps
   labels:
+    run: ftps
     app: ftps
 spec:
   ports:
@@ -11,8 +12,8 @@ spec:
     - port: 21000
       name: ftps-data
   selector:
+    run: ftps
     app: ftps
-  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

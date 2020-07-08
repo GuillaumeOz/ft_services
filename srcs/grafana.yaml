@@ -325,15 +325,16 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    name: grafana
   name: grafana
+  labels:
+    run: grafana
+    app: grafana
 spec:
-  type: LoadBalancer
   ports:
   - port: 3000
     targetPort: 3000
   selector:
+    run: grafana
     app: grafana
 ---
 apiVersion: apps/v1
