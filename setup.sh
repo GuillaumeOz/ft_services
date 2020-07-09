@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/09 13:04:25 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/07/09 19:38:20 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -217,7 +217,7 @@ echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
 echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
 echo -ne "$_NOCOLOR"
 
-kubectl apply -f srcs/metallb.yaml > /dev/null #Test this
+kubectl apply -f srcs/metallb.yaml > /dev/null
 
 for SERVICE in $SERVICE_LIST
 do
