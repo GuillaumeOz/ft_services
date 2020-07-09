@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: wordpress
   labels:
+    run: wordpress
     app: wordpress
 spec:
   ports:
@@ -10,8 +11,8 @@ spec:
       port: 80
       targetPort: 5050
   selector:
+    run: wordpress
     app: wordpress
-  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

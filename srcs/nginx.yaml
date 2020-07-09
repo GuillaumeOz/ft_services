@@ -1,5 +1,5 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: nginx
   labels:
@@ -11,28 +11,15 @@ spec:
       port: 80
       targetPort: 80
       protocol: TCP
-  selector:
-    run: nginx
-    app: nginx
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: nginx-service
-  labels:
-    run: nginx-service
-    app: nginx-service
-spec:
-  ports:
     - name: ssh
       port: 22
       targetPort: 22
     - name: https
       targetPort: 443
-      port: 443
+      port: 44
   selector:
-    run: nginx-service
-    app: nginx-service
+    run: nginx
+    app: nginx
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
