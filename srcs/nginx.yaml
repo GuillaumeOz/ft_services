@@ -2,65 +2,45 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
-  labels:
-    run: nginx
-    app: nginx
 spec:
+  type: LoadBalancer
   ports:
-    - name: http
-      port: 80
-      targetPort: 80
-      protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  - name: ssh
+    port: 22
+    targetPort: 22
+    protocol: TCP
   selector:
-    run: nginx
-    app: nginx
+    app: nginx-app
+
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-  labels:
-    run: nginx-service
-    app: nginx-service
-spec:
-  ports:
-    - name: ssh
-      port: 22
-      targetPort: 22
-    - name: https
-      targetPort: 443
-      port: 443
-  selector:
-    run: nginx-service
-    app: nginx-service
----
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
+  name: nginx-deployment
   labels:
-    app: nginx
+    app: nginx-app
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: nginx
-  replicas: 1
-  strategy:
-    type: Recreate
+      app: nginx-app
   template:
     metadata:
       labels:
-        app: nginx
+        app: nginx-app
     spec:
       containers:
-      - image: nginx_alpine
-        imagePullPolicy: Never
-        name: nginx
-        env:
-        - name: SSH_USER
-          value: admin
-        - name: SSH_PASSWORD
-          value: admin
+      - name: nginx
+        image: services/nginx
         ports:
         - containerPort: 80
           name: http
@@ -68,3 +48,9 @@ spec:
           name: https
         - containerPort: 22
           name: ssh
+        imagePullPolicy: IfNotPresent
+        env: 
+        - name: SSH_USER
+          value: admin
+        - name: SSH_PASSWORD
+          value: admin

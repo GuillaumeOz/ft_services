@@ -3,30 +3,20 @@ kind: Service
 metadata:
   name: wordpress
   labels:
-    run: wordpress
     app: wordpress
 spec:
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 5050
       targetPort: 5050
+      protocol: TCP
+      name: wordpress
   selector:
-    run: wordpress
     app: wordpress
+    tier: mysql
+  type: LoadBalancer
+
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: wp-pv-claim
-  labels:
-    app: wordpress
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
+
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
@@ -34,36 +24,32 @@ metadata:
   labels:
     app: wordpress
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: wordpress
+      tier: mysql
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app: wordpress
+        tier: mysql
     spec:
       containers:
-      - image: wordpress_alpine
-        imagePullPolicy: Never
+      - image: services/wordpress
         name: wordpress
         env:
-        - name: WORDPRESS_DB_HOST
-          value: mysql
-        - name: WORDPRESS_DB_USER
-          value: root
-        - name: WORDPRESS_DB_PASSWORD
-          value: password
-        - name: WORDPRESS_DB_NAME
-          value: wordpress
+          - name: DB_NAME
+            value: wordpress
+          - name: DB_USER
+            value: wp_admin
+          - name: DB_PASSWORD
+            value: admin
+          - name: DB_HOST
+            value: mysql-svc
         ports:
-        - containerPort: 80
+        - containerPort: 5050
           name: wordpress
-        volumeMounts:
-        - name: wordpress-persistent-storage
-          mountPath: /var/www/html
-      volumes:
-      - name: wordpress-persistent-storage
-        persistentVolumeClaim:
-          claimName: wp-pv-claim
+        imagePullPolicy: IfNotPresent

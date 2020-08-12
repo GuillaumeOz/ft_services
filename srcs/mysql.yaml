@@ -2,32 +2,52 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql
-  labels:
-    app: mysql
 spec:
+  type: ClusterIP
   ports:
-    - port: 3306
+  - name: mysql
+    port: 3306
+    targetPort: 3306
+    protocol: TCP
   selector:
     app: mysql
-  clusterIP: None
+
 ---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+
+---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pv-claim
-  labels:
-    app: mysql
+  name: mysql-volume
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
+
 ---
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: mysql-deployment
   labels:
     app: mysql
 spec:
@@ -35,34 +55,20 @@ spec:
   selector:
     matchLabels:
       app: mysql
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
         app: mysql
     spec:
-      restartPolicy: Always
       containers:
-      - image: mysql_alpine
-        imagePullPolicy: Never
-        name: mysql
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: password
-        - name: MYSQL_DATABASE
-          value: wordpress
-        - name: MYSQL_USER
-          value: root
-        - name: MYSQL_PASSWORD
-          value: password
-        ports:
-        - containerPort: 3306
-          name: mysql
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
+        - name: mysql
+          image: services/mysql
+          volumeMounts:
+            - mountPath: "/var/lib/mysql"
+              subPath: "mysql"
+              name: mysql-data
+          imagePullPolicy: IfNotPresent  
       volumes:
-      - name: mysql-persistent-storage
+      - name: mysql-data
         persistentVolumeClaim:
-          claimName: mysql-pv-claim
+          claimName: mysql-volume

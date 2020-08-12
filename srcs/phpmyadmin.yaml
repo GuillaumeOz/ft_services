@@ -1,22 +1,8 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: phpmyadmin
-  labels:
-    run: phpmyadmin
-    app: phpmyadmin
-spec:
-  ports:
-    - port: 80
-      targetPort: 5000
-  selector:
-    run: phpmyadmin
-    app: phpmyadmin
----
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: phpmyadmin
+  name: phpmyadmin-deployment
   labels:
     app: phpmyadmin
 spec:
@@ -24,20 +10,47 @@ spec:
   selector:
     matchLabels:
       app: phpmyadmin
+      tier: mysql
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: phpmyadmin
+        tier: mysql
     spec:
       containers:
-        - name: phpmyadmin
-          image: etopian/phpmyadmin
-          ports:
-            - containerPort: 80
-          env:
-            - name: MYSQL_HOSTNAME
-              value: mysql
-            - name: PMA_USERNAME
-              value: root
-            - name: PMA_PASSWORD
-              value: password
+      - name: phpmyadmin
+        image: services/phpmyadmin
+        ports:
+          - containerPort: 5000
+            name: phpmyadmin
+        env:
+          - name: PMA_HOST
+            value: mysql
+          - name: PMA_PORT
+            value: "3306"
+          - name: PMA_USER
+            value: wp_admin
+          - name: MYSQL_ROOT_PASSWORD
+            value: password
+        imagePullPolicy: IfNotPresent
+
+---
+
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: phpmyadmin
+    labels:
+      app: phpmyadmin
+  spec:
+    ports:
+      - port: 5000
+        targetPort: 5000
+        protocol: TCP
+        name: phpmyadmin
+    selector:
+      app: phpmyadmin
+      tier: mysql
+    type: LoadBalancer

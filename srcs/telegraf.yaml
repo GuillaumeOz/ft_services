@@ -1,71 +1,9 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: telegraf-secrets
-type: Opaque
-stringData:
-  INFLUXDB_DB: influxdb
-  INFLUXDB_URL: http://influxdb:8086
-  INFLUXDB_USER: root
-  INFLUXDB_USER_PASSWORD: password
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: telegraf-config
-data:
-  telegraf.conf: |+
-    # Configuration for telegraf agent
-    [agent]
-    ## Default data collection interval for all inputs
-      interval = "1s"
-      ## Rounds collection interval to 'interval'
-      ## ie, if interval="10s" then always collect on :00, :10, :20, etc.
-      round_interval = true
-    ###############################################################################
-    #                            OUTPUT PLUGINS                                   #
-    ###############################################################################
-    # Configuration for sending metrics to InfluxDB
-    [[outputs.influxdb]]
-      urls = ["http://influxdb:8086"]
-      database = "influxdb"
-    ###############################################################################
-    #                            INPUT PLUGINS                                    #
-    ###############################################################################
-    # Read metrics about cpu usage
-    [[inputs.kube_inventory]]
-    ## URL for the Kubernetes API
-      url = "https://kubernetes"
-      namespace = ""
-      bearer_token = "/run/secrets/kubernetes.io/serviceaccount/token"
-      resource_include = ["pods"]
-      insecure_skip_verify = true
-    # Read metrics about cpu usage
-    [[inputs.cpu]]
-      ## Whether to report per-cpu stats or not
-      percpu = true
-      ## Whether to report total system cpu stats or not
-      totalcpu = true
-      ## If true, collect raw CPU time metrics.
-      collect_cpu_time = false
-      ## If true, compute and report the sum of all non-idle CPU states.
-      report_active = false
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: telegraf
-  labels:
-    name: telegraf
-spec:
-  selector:
-    name: telegraf
-  clusterIP: None
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: telegraf-deployment
+  name: telegraf
+  labels:
+    app: telegraf
 spec:
   replicas: 1
   selector:
@@ -76,72 +14,57 @@ spec:
       labels:
         app: telegraf
     spec:
-      serviceAccountName: telegraf-account
+      serviceAccountName: telegraf
       containers:
-        - image: telegraf:alpine
-          name: telegraf
-          volumeMounts:
-            - mountPath: /etc/telegraf/telegraf.conf
-              name: telegraf-config
-              subPath: telegraf.conf
-              readOnly: true
-          envFrom:
-            - secretRef:
-                name: telegraf-secrets
+      - image: services/telegraf
+        imagePullPolicy: IfNotPresent
+        name: telegraf
+        ports:
+        - containerPort: 8125 
+        volumeMounts:
+        - name: telegraf-endpoint
+          mountPath: "/var/run/docker.sock"
       volumes:
-        - name: telegraf-config
-          configMap:
-            name: telegraf-config
+      - name: telegraf-endpoint
+        hostPath:
+          path: /var/run/docker.sock
+
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+
+apiVersion: v1
+kind: Service
 metadata:
-  name: influx:cluster:viewer
-  labels:
-    rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
-rules:
-  - apiGroups: [""]
-    resources:
-    - persistentvolumes
-    - nodes
-    - endpoints
-    - deployments
-    - services
-    - pods
-    - statefulsets
-    - daemonsets
-    - persistentvolumeclaims
-    - ingresses
-    verbs: ["get", "list"]
+  name: telegraf
+  labels: 
+    app: telegraf
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8125
+      targetPort: 8125
+  selector:
+    app: telegraf
+
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: influx:telegraf
-aggregationRule:
-  clusterRoleSelectors:
-    - matchLabels:
-        rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
-    - matchLabels:
-        rbac.authorization.k8s.io/aggregate-to-view: "true"
-rules: [] # Rules are automatically filled in by the controller manager.
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: influx:telegraf:viewer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: influx:telegraf
-subjects:
-  - kind: ServiceAccount
-    name: telegraf-account
-    namespace: default
----
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: telegraf-account
+  name: telegraf
   labels:
     app: telegraf
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: telegraf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: telegraf
+  namespace: default

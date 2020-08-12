@@ -3,18 +3,39 @@ kind: Service
 metadata:
   name: ftps
   labels:
-    run: ftps
     app: ftps
 spec:
+  type: LoadBalancer
   ports:
-    - port: 21
-      name: ftps
-    - port: 21000
-      name: ftps-data
+  - port: 21
+    name: ftps
+  - port: 21000
+    name: ftps-21000
+  - port: 21001
+    name: ftps-21001
+  - port: 21002      
+    name: ftps-21002
+  - port: 21003
+    name: ftps-21003
+  - port: 21004
+    name: ftps-21004
+  - port: 21005
+    name: ftps-21005
+  - port: 21006
+    name: ftps-21006
+  - port: 21007
+    name: ftps-21007
+  - port: 21008
+    name: ftps-21008
+  - port: 21009
+    name: ftps-21009
+  - port: 21010
+    name: ftps-21010
   selector:
-    run: ftps
     app: ftps
+
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -27,18 +48,20 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
 ---
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ftps
+  name: ftps-deployment
   labels:
     app: ftps
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: ftps
-  replicas: 1
   strategy:
     type: Recreate
   template:
@@ -47,22 +70,42 @@ spec:
         app: ftps
     spec:
       containers:
-      - image: ftps_alpine
-        imagePullPolicy: Never
-        name: ftps
-        env:
-        - name: FTP_USER
-          value: admin
-        - name: FTP_PASSWORD
-          value: admin
-        ports:
-        - containerPort: 21
-          hostPort: 21
-        - containerPort: 21000
-          hostPort: 21000
-        volumeMounts:
-        - name: ftps-persistent-storage
-          mountPath: /ftps
+        - name: ftps
+          image: services/ftps
+          env:
+            - name: USER
+              value: admin
+            - name: PASSWORD
+              value: password
+          ports:
+          - containerPort: 21
+            hostPort: 21
+          - containerPort: 21000
+            hostPort: 21000
+          - containerPort: 21001
+            hostPort: 21001
+          - containerPort: 21002
+            hostPort: 21002
+          - containerPort: 21003
+            hostPort: 21003
+          - containerPort: 21004
+            hostPort: 21004
+          - containerPort: 21005
+            hostPort: 21005
+          - containerPort: 21006
+            hostPort: 21006
+          - containerPort: 21007
+            hostPort: 21007
+          - containerPort: 21008
+            hostPort: 21008
+          - containerPort: 21009
+            hostPort: 21009
+          - containerPort: 21010
+            hostPort: 21010
+          volumeMounts:
+            - name: ftps-persistent-storage
+              mountPath: /ftp/ftp
+          imagePullPolicy: IfNotPresent
       volumes:
       - name: ftps-persistent-storage
         persistentVolumeClaim:
