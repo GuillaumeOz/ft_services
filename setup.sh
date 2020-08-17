@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/07/09 19:38:20 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/17 15:15:26 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,22 @@ _NOCOLOR='\033[0m'
 # Variables
 
 PACKAGES=""
-SERVICE_LIST="mysql phpmyadmin nginx wordpress ftps influxdb grafana telegraf"
+SERVICE_LIST="nginx mysql wordpress phpmyadmin ftps influxdb telegraf grafana"
+MINIKUBE_IP="$(kubectl get node -o=custom-columns='DATA:status.addresses[0].address' | sed -n 2p)"
+sed_list="srcs/telegraf/telegraf.conf"
+
+set -x
+
+#-----------------Env Configuration-----------------#
+# Ensure USER variabe is set
+[ -z "${USER}" ] && export USER=`whoami`
+[ -z "${WORKDIR}" ] && WORKDIR=`pwd`
+# Set the minikube directory in current folder
+# Enable this command if you run the projet at 42
+# export MINIKUBE_HOME="/goinfre/$USER"
+export MAC_42=1
+export sudo='';
+export driver='docker'
 
 # Functions
 
@@ -47,6 +62,27 @@ function install_packages()
 	╔══════════════════════╗
 	║██████████████████████║  (100%)
 	╚══════════════════════╝\n"
+}
+
+function sed_configs()
+{
+    sed -i.bak 's/MINIKUBE_IP/'"$1"'/g' $2
+    echo "configured $2 with $1"
+    sleep 1
+}
+
+function sed_configs_back()
+{
+    sed -i.bak "s/$1/""MINIKUBE_IP"'/g' $2
+    echo "deconfigured $2"
+    sleep 1
+}
+
+function build_apply()
+{
+    docker build -t services/$1 srcs/$1
+    sleep 1
+    kubectl apply -f srcs/$1/$1.yml
 }
 
 function apply_yaml()
@@ -102,160 +138,235 @@ sleep 0.5
 # 	exit
 # fi
 
-#----------------------------Sudo Mode------------------------------#
+#-----------------------------42 or VM------------------------------#
 
-sudo usermod -aG sudo $USER > /dev/null
+if [ $MAC_42 -eq 1 ]
+then
+	#------------------------42 PART-------------------------------#
+    export driver='virtualbox'
+    export MINIKUBE_HOME=/goinfre/${USER}/
+    # Install and verify that docker is running
+    docker-machine create default
+    docker-machine start
 
-#------------------------Update Packages----------------------------#
+	#----------------------Launch minikube--------------------------#
+	$sudo minikube start --vm-driver=$driver  --bootstrapper=kubeadm
 
-echo -ne "$_GREEN➜$_YELLOW Update Packages... \n"
-install_packages sudo apt-get -y update
-echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
-echo -ne "$_GREEN➜$_YELLOW Upgrade Packages... \n"
-install_packages sudo apt-get -y dist-upgrade
-echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+	if [[ $? == 0 ]]
+	then
+    	eval $($sudo minikube docker-env)
+    	printf "Minikube started\n"
+	else
+    	$sudo minikube delete
+    	printf "Error occured\n"
+   		exit
+	fi
 
-#---------------------Install Docker--------------------------------#
+	for name in $sed_list
+	do
+    	sed_configs $MINIKUBE_IP $name
+	done
 
-which docker > /dev/null
-if [[ $? != 0 ]] ; then
-	echo -ne "$_GREEN➜$_YELLOW Install Docker... \n"
-	PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
-	install_packages $PACKAGES
+	#----------------------Delete all pods--------------------------#
+	kubectl delete -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
+	kubectl delete -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+	kubectl delete -f srcs/nginx.yml
+	kubectl delete -f srcs/mysql.yml
+	kubectl delete -f srcs/wordpress.yml
+	kubectl delete -f srcs/phpmyadmin.yml
+	kubectl delete -f srcs/ftps.yml
+	kubectl delete -f srcs/grafana.yml
+	kubectl delete -f srcs/influxdb.yml
+	kubectl delete -f srcs/telegraf.yml
+
+	#----------------------Install metallb--------------------------#
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+	kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+	kubectl apply -f srcs/metallb.yml
+    sed_configs 192.168.99.127 srcs/ftps/scripts/start.sh
+    sed_configs 192.168.99.125 srcs/mysql/wordpress.sql
+
+else
+	#-------------------------VM PART-------------------------------#
+    export sudo='sudo'
+	$sudo usermod -aG sudo $USER > /dev/null
+
+	#------------------------Update Packages------------------------#
+
+	echo -ne "$_GREEN➜$_YELLOW Update Packages... \n"
+	install_packages $sudo apt-get -y update
 	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+	echo -ne "$_GREEN➜$_YELLOW Upgrade Packages... \n"
+	install_packages $sudo apt-get -y dist-upgrade
+	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+
+	#---------------------Install Docker--------------------------------#
+
+	which docker > /dev/null
+	if [[ $? != 0 ]] ; then
+		echo -ne "$_GREEN➜$_YELLOW Install Docker... \n"
+		PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
+		install_packages $PACKAGES
+		echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+	fi
+
+	#---------------------Install Kubectl-------------------------------#
+
+	$sudo rm -rf /usr/local/bin/kubectl
+	echo -ne "$_GREEN➜$_YELLOW Install Kubectl... \n"
+	PACKAGES="curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+	install_packages $PACKAGES
+	chmod +x ./kubectl
+	$sudo mv ./kubectl /usr/local/bin/kubectl
+	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+
+	#---------------------Install Minikube------------------------------#
+
+	$sudo rm -rf /usr/local/bin/minikube
+	which minikube > /dev/null
+	echo -ne "$_GREEN➜$_YELLOW Install Minikube... \n"
+	PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+	install_packages $PACKAGES
+	chmod +x minikube
+	$sudo cp minikube /usr/local/bin && rm minikube
+	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+
+	#-------------------Start Minikube------------------#
+	# Start the cluster if it's not running
+	# What you’ll need 
+	# 2 CPUs or more
+	# Internet connection
+	if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
+		# Starts a local Kubernetes cluster
+		# --cpus [int] Number of CPUs allocated to Kubernetes. (default 2)
+		# --memory [string] Amount of RAM to allocate to Kubernetes (format: <number>[<unit>], where unit = b, k, m or g).
+		# --vm-driver driver DEPRECATED, use driver instead.
+		# --extra-config ExtraOption A set of key=value pairs that describe configuration that may be passed to different components.
+   		# The key should be '.' separated, and the first part before the dot is the component to apply the configuration to.
+    	# Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
+    	# Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
+		# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
+		# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
+		# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
+		minikube start --vm-driver=$driver --bootstrapper=kubeadm
+
+		if [[ $? != 0 ]]
+		then
+			$sudo minikube delete
+    		echo -ne "$_GREEN➜$_YELLOW Error occured $_GREEN✓$_YELLOW \n"
+    		exit
+		fi
+
+		# Enable or disable a minikube addon
+		# Measuring Resource Usage
+		minikube addons enable metrics-server
+		# Web interface for kubernetes
+		minikube addons enable metallb
+		minikube addons enable dashboard
+	fi
+
+	#-----------------Minkube Config-----------------#
+
+	# To point your shell to minikube's docker-daemon.
+	# eval — construct command by concatenating arguments
+	# -p, --profile string The name of the minikube VM being used.
+	# This can be set to allow having multiple instances of minikube independently. (default "minikube")
+	# docker-env Configure environment to use minikube’s Docker daemon
+	# set the environment variable with eval command
+	eval $($sudo minikube docker-env)
+
+	# TELEGRAF EDIT .CONF FILE
+
+	for name in $sed_list
+	do
+    	sed_configs $MINIKUBE_IP $name
+	done
+
+	#----------------------Delete all pods--------------------------#
+	kubectl delete -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
+	kubectl delete -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+	kubectl delete -f srcs/nginx.yml
+	kubectl delete -f srcs/mysql.yml
+	kubectl delete -f srcs/wordpress.yml
+	kubectl delete -f srcs/phpmyadmin.yml
+	kubectl delete -f srcs/ftps.yml
+	kubectl delete -f srcs/grafana.yml
+	kubectl delete -f srcs/influxdb.yml
+	kubectl delete -f srcs/telegraf.yml
+
+	#----------------------Install metallb--------------------------#
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+	kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+	kubectl apply -f srcs/metallbVM.yml
+    sed_configs 172.17.0.5 srcs/ftps/setup.sh
+    sed_configs 172.17.0.3 srcs/mysql/wordpress.sql
+
+	# MINIKUBE_IP EDIT IN WORDPRESS SQL
+
+	cp srcs/wordpress/files/wordpress.sql srcs/wordpress/files/wordpress-tmp.sql
+	sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/wordpress/files/wordpress-tmp.sql
+	cp srcs/ftps/scripts/start.sh srcs/ftps/scripts/start-tmp.sh
+	sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/ftps/scripts/start-tmp.sh
+
+	# Build Docker images
+
+	echo -ne "$_GREEN➜$_YELLOW Building Docker images...\n"
+	docker build -t mysql_alpine srcs/mysql
+	docker build -t wordpress_alpine srcs/wordpress
+	docker build -t nginx_alpine srcs/nginx
+	docker build -t ftps_alpine srcs/ftps
+	docker build -t grafana_alpine srcs/grafana
+	echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
+
+	# Deploy services
+
+	echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
+	echo -ne "$_NOCOLOR"
+
+	kubectl apply -f srcs/metallb.yaml > /dev/null
+
+	for SERVICE in $SERVICE_LIST
+	do
+		apply_yaml $SERVICE
+	done
+
+	# Import Wordpress database
+	kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql -u root -e 'CREATE DATABASE wordpress;'
+	kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql wordpress -u root < srcs/wordpress/files/wordpress-tmp.sql
+
+	# Remove TMP files
+	rm -rf srcs/ftps/scripts/start-tmp.sh
+	rm -rf srcs/wordpress/files/wordpress-tmp.sql
+
+	echo -ne "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
+	echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
+
+	### Launch Dashboard
+	# minikube dashboard
+
+	### Test SSH
+	# ssh admin@$(minikube ip) -p 22
+
+	### Crash Container
+	# kubectl exec -it $(kubectl get pods | grep mysql | cut -d" " -f1) -- /bin/sh -c "kill 1"
+
+	### Export/Import Files from containers
+	# kubectl cp srcs/grafana/grafana.db default/$(kubectl get pods | grep grafana | cut -d" " -f1):/var/lib/grafana/grafana.db
+
+	# ENV
+	# Alpine Linux
+
+	# API
+	# 1 - Nginx
+	# 2 - FTPS
+	# 3 - WordPress
+	# 4 - phpMyAdmin
+	# 5 - MariaDB (MySQL)
+	# 6 - Grafana
+	#     InfluxDB
+	#     Telegraf
 fi
-
-#------------------Install Kubectl------------------#
-
-sudo rm -rf /usr/local/bin/kubectl
-echo -ne "$_GREEN➜$_YELLOW Install Kubectl... \n"
-PACKAGES="curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-install_packages $PACKAGES
-chmod +x ./kubectl
-sudo mv ./kubectl /usr/local/bin/kubectl
-echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
-
-#------------------Install Minikube------------------------------#
-
-sudo rm -rf /usr/local/bin/minikube
-which minikube > /dev/null
-echo -ne "$_GREEN➜$_YELLOW Install Minikube... \n"
-PACKAGES="curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
-install_packages $PACKAGES
-chmod +x minikube
-sudo cp minikube /usr/local/bin && rm minikube
-echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
-
-#-----------------Env Configuration-----------------#
-# Ensure USER variabe is set
-[ -z "${USER}" ] && export USER=`whoami`
-[ -z "${WORKDIR}" ] && WORKDIR=`pwd`
-# Set the minikube directory in current folder
-# Enable this command if you run the projet at 42
-# export MINIKUBE_HOME="/goinfre/$USER"
-
-#-------------------Start Minikube------------------#
-# Start the cluster if it's not running
-# What you’ll need 
-# 2 CPUs or more
-# 2GB of free memory
-# 20GB of free disk space
-# Internet connection
-# Container or VirtualBox
-if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
-	# Starts a local Kubernetes cluster
-	# --cpus [int] Number of CPUs allocated to Kubernetes. (default 2)
-	# --memory [string] Amount of RAM to allocate to Kubernetes (format: <number>[<unit>], where unit = b, k, m or g).
-	# --vm-driver driver DEPRECATED, use driver instead.
-	# --extra-config ExtraOption A set of key=value pairs that describe configuration that may be passed to different components.
-    # The key should be '.' separated, and the first part before the dot is the component to apply the configuration to.
-    # Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
-    # Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
-	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
-	# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
-	# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
-	minikube start --cpus=2 --memory 4000 --driver=docker --extra-config=apiserver.service-node-port-range=1-35000
-	# Enable or disable a minikube addon
-	# Measuring Resource Usage
-	minikube addons enable metrics-server
-	# Web interface for kubernetes
-	minikube addons enable metallb
-	minikube addons enable dashboard
-fi
-
-#-----------------Minkube Config-----------------#
-
-MINIKUBE_IP=$(minikube ip)
-
-# To point your shell to minikube's docker-daemon.
-# eval — construct command by concatenating arguments
-# -p, --profile string The name of the minikube VM being used.
-# This can be set to allow having multiple instances of minikube independently. (default "minikube")
-# docker-env Configure environment to use minikube’s Docker daemon
-# set the environment variable with eval command
-eval $(minikube -p minikube docker-env)
-
-# MINIKUBE_IP EDIT IN WORDPRESS SQL
-
-cp srcs/wordpress/files/wordpress.sql srcs/wordpress/files/wordpress-tmp.sql
-sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/wordpress/files/wordpress-tmp.sql
-cp srcs/ftps/scripts/start.sh srcs/ftps/scripts/start-tmp.sh
-sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/ftps/scripts/start-tmp.sh
-
-# Build Docker images
-
-echo -ne "$_GREEN➜$_YELLOW Building Docker images...\n"
-docker build -t mysql_alpine srcs/mysql
-docker build -t wordpress_alpine srcs/wordpress
-docker build -t nginx_alpine srcs/nginx
-docker build -t ftps_alpine srcs/ftps
-docker build -t grafana_alpine srcs/grafana
-echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
-
-# Deploy services
-
-echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
-echo -ne "$_NOCOLOR"
-
-kubectl apply -f srcs/metallb.yaml > /dev/null
-
-for SERVICE in $SERVICE_LIST
-do
-	apply_yaml $SERVICE
-done
-
-# Import Wordpress database
-kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql -u root -e 'CREATE DATABASE wordpress;'
-kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql wordpress -u root < srcs/wordpress/files/wordpress-tmp.sql
-
-# Remove TMP files
-rm -rf srcs/ftps/scripts/start-tmp.sh
-rm -rf srcs/wordpress/files/wordpress-tmp.sql
-
-echo -ne "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
-echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
-
-### Launch Dashboard
-# minikube dashboard
-
-### Test SSH
-# ssh admin@$(minikube ip) -p 22
-
-### Crash Container
-# kubectl exec -it $(kubectl get pods | grep mysql | cut -d" " -f1) -- /bin/sh -c "kill 1"
-
-### Export/Import Files from containers
-# kubectl cp srcs/grafana/grafana.db default/$(kubectl get pods | grep grafana | cut -d" " -f1):/var/lib/grafana/grafana.db
-
-# ENV
-# Alpine Linux
-
-# API
-# 1 - Nginx
-# 2 - FTPS
-# 3 - WordPress
-# 4 - phpMyAdmin
-# 5 - MariaDB (MySQL)
-# 6 - Grafana
-#     InfluxDB
-#     Telegraf

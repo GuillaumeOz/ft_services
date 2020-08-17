@@ -1,22 +1,29 @@
-FROM nginx:alpine
+FROM alpine:latest
 
-RUN apk upgrade --update-cache --available && \
-    apk add openssl openssh && \
-    rm -rf /var/cache/apk/*
+# Install nginx and its dependencies
+RUN apk update && apk add nginx \
+&& apk add --no-cache --upgrade bash \
+&& apk add openssl && mkdir -p var/run/nginx \
+&& apk add openssl openssh \
+&& rm -rf /var/cache/apk/*
 
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj '/C=FR/ST=75/L=Paris/O=42/CN=gozsertt' -keyout /etc/ssl/certs/localhost.key -out /etc/ssl/certs/localhost.crt
+#RUN NGINX
+RUN mkdir -p /www
+COPY ./index.html /www
 
-COPY files/nginx.conf /etc/nginx/nginx.conf
-COPY scripts/start.sh /start.sh
-COPY files/index.html /usr/share/nginx/html
+# Create the file with the ssl key inside
+RUN mkdir -p /etc/nginx/ssl && openssl req -newkey rsa:2048 -x509 -days 365 -nodes -keyout /etc/nginx/ssl/services.key -out /etc/nginx/ssl/services.pem -subj "/C=FR/ST=Paris/L=Paris/O=42, Inc./OU=IT/CN=ft_services"
 
-COPY files/sshd_config /etc/ssh/
+RUN	usr/bin/ssh-keygen -A 
+COPY	sshd_config /etc/ssh/
 
-COPY files/ssh_host_dsa_key /etc/ssh
-COPY files/ssh_host_rsa_key /etc/ssh
+# Nginnx config
+RUN rm /etc/nginx/nginx.conf
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
-RUN chmod 600 /etc/ssh/ssh_host_*
+COPY setup.sh .
 
-EXPOSE 22 80 443
-#Check the entrypoint success command
-ENTRYPOINT sh /start.sh
+RUN chmod +x setup.sh
+
+EXPOSE 80 443 22
+CMD ./setup.sh

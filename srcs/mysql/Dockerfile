@@ -1,15 +1,20 @@
 FROM alpine:latest
 
-RUN apk update && \
-	apk add mysql mysql-client && \
-	addgroup mysql mysql && \
-	rm -rf /var/cache/apk/*
+# installation
+RUN apk update \
+&& apk add mariadb mariadb-client && apk add --no-cache --upgrade bash \
+&& rm -rf /var/cache/apk/*
 
-COPY scripts/start.sh /bin/start.sh
-COPY files/my.cnf /etc/mysql/my.cnf
+# RUN service mysql start
+RUN mysql --version
 
-VOLUME ["/var/lib/mysql"]
+# Copy initialisation script
+COPY ./init_docker.sh .
+COPY ./setup.sh .
+COPY ./wordpress.sql .
 
-EXPOSE 3306
+# Add permission
+RUN chmod 777 init_docker.sh
+RUN chmod 777 setup.sh
 
-ENTRYPOINT ["/bin/start.sh"]
+ENTRYPOINT [ "./init_docker.sh" ]
