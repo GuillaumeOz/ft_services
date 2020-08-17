@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/17 15:15:26 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/17 18:22:55 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ SERVICE_LIST="nginx mysql wordpress phpmyadmin ftps influxdb telegraf grafana"
 MINIKUBE_IP="$(kubectl get node -o=custom-columns='DATA:status.addresses[0].address' | sed -n 2p)"
 sed_list="srcs/telegraf/telegraf.conf"
 
-set -x
+#set -x
 
 #-----------------Env Configuration-----------------#
 # Ensure USER variabe is set
@@ -64,25 +64,22 @@ function install_packages()
 	╚══════════════════════╝\n"
 }
 
-function sed_configs()
-{
+sed_configs () {
     sed -i.bak 's/MINIKUBE_IP/'"$1"'/g' $2
     echo "configured $2 with $1"
     sleep 1
 }
 
-function sed_configs_back()
-{
+sed_configs_back () {
     sed -i.bak "s/$1/""MINIKUBE_IP"'/g' $2
     echo "deconfigured $2"
     sleep 1
 }
 
-function build_apply()
-{
+build_apply () {
     docker build -t services/$1 srcs/$1
     sleep 1
-    kubectl apply -f srcs/$1/$1.yml
+    kubectl apply -f srcs/$1.yml
 }
 
 function apply_yaml()
@@ -109,9 +106,10 @@ if [[ $1 = 'clean' ]] ; then
 	echo -ne "$_GREEN➜$_YELLOW	Cleaning all services...\n"
 	for SERVICE in $SERVICE_LIST ; do
 	# Delete a pod using the type and name specified in the pod.yaml file.
-		kubectl delete -f srcs/$SERVICE.yaml > /dev/null
+		kubectl delete -f srcs/$SERVICE.yml > /dev/null
 	done
-	kubectl delete -f srcs/metallb.yaml > /dev/null
+	kubectl delete -f srcs/metallb.yml > /dev/null
+	kubectl delete -f srcs/metallbVM.yml > /dev/null
 	echo -ne "$_GREEN✓$_YELLOW	Clean complete !\n"
 	exit
 fi
@@ -188,6 +186,21 @@ then
     sed_configs 192.168.99.127 srcs/ftps/scripts/start.sh
     sed_configs 192.168.99.125 srcs/mysql/wordpress.sql
 
+	#----------------build images and apply deployments-------------#
+	for service in $SERVICE_LIST
+	do
+   		build_apply $service
+	done
+
+	# File deconfiguration
+	for name in $sed_list
+	do
+    	sed_configs_back $MINIKUBE_IP $name
+	done
+
+	# Start dashboard
+	$sudo minikube dashboard &
+
 else
 	#-------------------------VM PART-------------------------------#
     export sudo='sudo'
@@ -261,10 +274,13 @@ else
 
 		# Enable or disable a minikube addon
 		# Measuring Resource Usage
-		minikube addons enable metrics-server
+
+		# minikube addons enable metrics-server
+
 		# Web interface for kubernetes
-		minikube addons enable metallb
-		minikube addons enable dashboard
+
+		# minikube addons enable metallb
+		# minikube addons enable dashboard
 	fi
 
 	#-----------------Minkube Config-----------------#
@@ -305,13 +321,6 @@ else
     sed_configs 172.17.0.5 srcs/ftps/setup.sh
     sed_configs 172.17.0.3 srcs/mysql/wordpress.sql
 
-	# MINIKUBE_IP EDIT IN WORDPRESS SQL
-
-	cp srcs/wordpress/files/wordpress.sql srcs/wordpress/files/wordpress-tmp.sql
-	sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/wordpress/files/wordpress-tmp.sql
-	cp srcs/ftps/scripts/start.sh srcs/ftps/scripts/start-tmp.sh
-	sed -i "s/MINIKUBE_IP/$MINIKUBE_IP/g" srcs/ftps/scripts/start-tmp.sh
-
 	# Build Docker images
 
 	echo -ne "$_GREEN➜$_YELLOW Building Docker images...\n"
@@ -327,26 +336,26 @@ else
 	echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
 	echo -ne "$_NOCOLOR"
 
-	kubectl apply -f srcs/metallb.yaml > /dev/null
-
 	for SERVICE in $SERVICE_LIST
 	do
 		apply_yaml $SERVICE
+	done
+
+	# File deconfiguration
+	for name in $sed_list
+	do
+  		sed_configs_back $MINIKUBE_IP $name
 	done
 
 	# Import Wordpress database
 	kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql -u root -e 'CREATE DATABASE wordpress;'
 	kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql wordpress -u root < srcs/wordpress/files/wordpress-tmp.sql
 
-	# Remove TMP files
-	rm -rf srcs/ftps/scripts/start-tmp.sh
-	rm -rf srcs/wordpress/files/wordpress-tmp.sql
-
 	echo -ne "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
 	echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
 
-	### Launch Dashboard
-	# minikube dashboard
+	# Start dashboard
+	$sudo minikube dashboard &
 
 	### Test SSH
 	# ssh admin@$(minikube ip) -p 22
