@@ -1,72 +1,67 @@
-<script language="Javascript">
-	document.addEventListener('click', function(event) {
-	  var target = event.target;
-	  if (target.tagName.toLowerCase() == 'a')
-	  {
-	      var port = target.getAttribute('href').match(/^:(\d+)(.*)/);
-	      if (port)
-	      {
-	         target.href = window.location.origin;
-	         target.port = port[1];
-	      }
-	  }
-	}, false);
-</script>
-
+<!DOCTYPE html>
 <html>
-	<head>
-	    <title> Ft_services by Guillaume Oz (gozsertt) ;) </title>
-		<style type="text/css">
-			body {
-				background-color: #121212
-				}
-			#navbar {
-				margin:0 auto;
-				padding:5px 0;
-				text-align:center;
-				font-family: Helvetica, Geneva, Arial, SunSans-Regular, sans-serif;
-				font-size: 25px;
-				#navbar a:link{
-					display:inline-block;
-					margin-left: 5px;
-					padding: 5px 10px;
-					text-decoration:none;
-					color: #AAAAAA;
-					font-size: 28px;
-					}
-				}
-			.parent {
-				margin-top: 50vh; /* poussé de la moitié de hauteur de viewport */
-  				transform: translateY(-50%); /* tiré de la moitié de sa propre hauteur */
-			}
-			a {
-			  color: #00ffff;
-			  text-decoration:none;
-			  padding:10px;
-			  margin-bottom:1px;
-			}
-			a:hover {
-			  color: #00fff0;
-			}
-			h1 {
-				font-family: Helvetica, Geneva, Arial, SunSans-Regular, sans-serif;
-				color: #00ffff;
-				font-size: 45px;
-				}
-		</style>
-	</head>
+    <head>
+        <title>Ft_services by Guillaume Oz (gozsertt)</title>
+        <style>
+            html {
+                font-size: 100%;
+                height: 100%;
+            }
+            body {
+                background: linear-gradient(#151823, #252B37);
+                box-sizing: border-box;
+                color: #ffffff;
+                font-family: 'Source Sans Pro', sans-serif;
+                height: 100%;
+                line-height: 1.5;
+                margin: 0;
+                padding: 90px;
+                text-align: center;
+            }
+            h1 {
+                font-size: 4rem;
+                font-weight: bold;
+                line-height: 1;
+                margin: 0 0 1rem 0;
+            }
+            p {
+                margin: 0 0 1rem 0;
+            }
+            a {
+                color: #1abc89;
+                font-size: 1.2rem;
+                margin: 0 0 1rem 0;
+                text-decoration: none;
+            }
+            a:hover, a:active {
+                color: #1d8564;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>WELCOME</h1>
+        <br/>
 
-	<body>
-		<center>
-		<div class="parent">
-			<h1>ft_services by Guillaume Oz (gozsertt)</h1>
-			<br>
-			<ul id="navbar">
-				<a target="_blank" rel="noopener noreferrer" href=":5050">Wordpress</a> |
-				<a target="_blank" rel="noopener noreferrer" href=":5000">Phpmyadmin</a> |
-				<a target="_blank" rel="noopener noreferrer" href=":3000">Grafana</a>
-			</ul>
-		</div>
-		</center>
-	</body>
+        <p>If you see this page, the nginx web server is successfully installed and working.</p><br/>
+
+        <p>Available services:</p><br>
+
+        <a href="../wordpress">WordPress</a>
+        <br/><br/>
+
+        <p><em>user: wp_admin</em></p>
+        <p><em>password: admin</em></p><br/>
+
+        <a href="../phpmyadmin">phpMyAdmin</a>
+        <br/><br/>
+
+        <p><em>user: php_admin</em></p>
+		<p><em>password: password</em></p>
+
+		<a href="../grafana">Grafana</a>
+        <br/><br/>
+
+        <p><em>user: admin</em></p>
+        <p><em>password: admin</em></p>
+    </body>
 </html>

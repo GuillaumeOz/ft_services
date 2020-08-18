@@ -95,32 +95,22 @@ In our project, InfluxDB will stock the necessairy data for running Grafana appl
 
 ## Usage
 
-The setup script check if : ```Docker```, ```VirtualBox```, ```minikube``` and ```kubectl``` are installed.
+The setup script check if : ```Docker```, ```VirtualBox```, ```minikube``` and ```kubectl``` are installed for the VM.
 If not the script installs it for you.
+For running the script one 42 Mac, run ```ini_docker.sh``` script.
 
 * Setup :
 
 ```shell
-# Start the setup
-./setup.sh
+# Start the setup for 42Mac
+bash setup.sh 42mac
+
+# Start the setup for VM
+bash setup.sh vm
 
 # Remove all containers
 ./setup.sh clean
 ```
-
-* Exposed services access :
-
-```ip_address:port```
-
-* SSH :
-
-```shell
-ssh admin@$(minikube ip) -p 22
-```
-
-* FTPS :
-
-Use ```Filezilla``` and connect with ```admin:admin``` on port 21
 
 ## PORTS
 
@@ -135,5 +125,3 @@ Use ```Filezilla``` and connect with ```admin:admin``` on port 21
 ### Acknowledgements
 
 School project done at [42 Paris](https://www.42.fr).
-
-WordPress theme: [Cyanotype](https://wordpress.org/themes/cyanotype/) By Automattic.

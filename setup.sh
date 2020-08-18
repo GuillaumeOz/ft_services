@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/17 18:22:55 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/18 14:50:29 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,27 +23,24 @@ _CYAN='\033[36m'
 _WHITE='\033[37m'
 _NOCOLOR='\033[0m'
 
-# Variables
+#---------------Variables Configuration----------------#
 
 PACKAGES=""
 SERVICE_LIST="nginx mysql wordpress phpmyadmin ftps influxdb telegraf grafana"
-MINIKUBE_IP="$(kubectl get node -o=custom-columns='DATA:status.addresses[0].address' | sed -n 2p)"
 sed_list="srcs/telegraf/telegraf.conf"
 
-#set -x
+# set -x
 
-#-----------------Env Configuration-----------------#
 # Ensure USER variabe is set
 [ -z "${USER}" ] && export USER=`whoami`
 [ -z "${WORKDIR}" ] && WORKDIR=`pwd`
 # Set the minikube directory in current folder
 # Enable this command if you run the projet at 42
 # export MINIKUBE_HOME="/goinfre/$USER"
-export MAC_42=1
 export sudo='';
 export driver='docker'
 
-# Functions
+#----------------Functions definition------------------#
 
 function install_packages()
 {
@@ -64,19 +61,22 @@ function install_packages()
 	╚══════════════════════╝\n"
 }
 
-sed_configs () {
+function sed_configs()
+{
     sed -i.bak 's/MINIKUBE_IP/'"$1"'/g' $2
     echo "configured $2 with $1"
     sleep 1
 }
 
-sed_configs_back () {
+function sed_configs_back()
+{
     sed -i.bak "s/$1/""MINIKUBE_IP"'/g' $2
     echo "deconfigured $2"
     sleep 1
 }
 
-build_apply () {
+function build_apply()
+{
     docker build -t services/$1 srcs/$1
     sleep 1
     kubectl apply -f srcs/$1.yml
@@ -138,8 +138,7 @@ sleep 0.5
 
 #-----------------------------42 or VM------------------------------#
 
-if [ $MAC_42 -eq 1 ]
-then
+if [[ $1 = '42mac' ]] ; then
 	#------------------------42 PART-------------------------------#
     export driver='virtualbox'
     export MINIKUBE_HOME=/goinfre/${USER}/
@@ -159,6 +158,8 @@ then
     	printf "Error occured\n"
    		exit
 	fi
+
+	MINIKUBE_IP="$(kubectl get node -o=custom-columns='DATA:status.addresses[0].address' | sed -n 2p)"
 
 	for name in $sed_list
 	do
@@ -201,7 +202,8 @@ then
 	# Start dashboard
 	$sudo minikube dashboard &
 
-else
+fi
+if [[ $1 = 'vm' ]] ; then
 	#-------------------------VM PART-------------------------------#
     export sudo='sudo'
 	$sudo usermod -aG sudo $USER > /dev/null
@@ -292,7 +294,7 @@ else
 	# docker-env Configure environment to use minikube’s Docker daemon
 	# set the environment variable with eval command
 	eval $($sudo minikube docker-env)
-
+	MINIKUBE_IP="$(kubectl get node -o=custom-columns='DATA:status.addresses[0].address' | sed -n 2p)"
 	# TELEGRAF EDIT .CONF FILE
 
 	for name in $sed_list
