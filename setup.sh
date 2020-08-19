@@ -94,9 +94,9 @@ function apply_yaml()
 	# [NAME] = Omitted, here details for all resources are displayed for 'kubectl get pods'
 	# [flags1] = -l <clé-label>=<valeur-label>
 	# [flags2] = -o or --output jsonpath=<modèle> 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' >> check fomatting output
-	while [[ $(kubectl get pods -l app=$@ -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-		sleep 1;
-	done
+	#while [[ $(kubectl get pods -l app=$@ -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+	#	sleep 1;
+	#done
 	echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 }
 
@@ -220,14 +220,13 @@ if [[ $1 = 'vm' ]] ; then
 	which docker > /dev/null
 	if [[ $? != 0 ]] ; then
 		echo -ne "$_GREEN➜$_YELLOW Install Docker... \n"
-		PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
-		#PACKAGES="apt install docker.io"
-		#sudo systemctl start docker
-		#sudo systemctl enable docker
+		PACKAGES="$sudo apt-get install docker.io"
 		install_packages $PACKAGES
-		$sudo groupadd docker
-		$sudo usermod -a -G docker ${USER}
-		$sudo newgrp docker
+		sudo systemctl start docker
+		sudo systemctl enable docker
+		#$sudo groupadd docker
+		#$sudo usermod -a -G docker ${USER}
+		#$sudo newgrp docker
 		echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 	fi
 
@@ -258,40 +257,38 @@ if [[ $1 = 'vm' ]] ; then
 	# What you’ll need 
 	# 2 CPUs or more
 	# Internet connection
-	if [[ $(minikube status | grep -c "Running") == 0 ]] ; then
-		# Starts a local Kubernetes cluster
-		# --cpus [int] Number of CPUs allocated to Kubernetes. (default 2)
-		# --memory [string] Amount of RAM to allocate to Kubernetes (format: <number>[<unit>], where unit = b, k, m or g).
-		# --vm-driver driver DEPRECATED, use driver instead.
-		# --extra-config ExtraOption A set of key=value pairs that describe configuration that may be passed to different components.
-   		# The key should be '.' separated, and the first part before the dot is the component to apply the configuration to.
-    	# Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
-    	# Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
-		# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
-		# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
-		# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
-		minikube start --vm-driver=$driver --bootstrapper=kubeadm
+	# Starts a local Kubernetes cluster
+	# --cpus [int] Number of CPUs allocated to Kubernetes. (default 2)
+	# --memory [string] Amount of RAM to allocate to Kubernetes (format: <number>[<unit>], where unit = b, k, m or g).
+	# --vm-driver driver DEPRECATED, use driver instead.
+	# --extra-config ExtraOption A set of key=value pairs that describe configuration that may be passed to different components.
+   	# The key should be '.' separated, and the first part before the dot is the component to apply the configuration to.
+    # Valid components are: kubelet, kubeadm, apiserver, controller-manager, etcd, proxy, scheduler
+    # Valid kubeadm parameters: ignore-preflight-errors, dry-run, kubeconfig, kubeconfig-dir, node-name, cri-socket, experimental-upload-certs, certificate-key, rootfs, skip-phases, pod-network-cidr
+	# If you set the type field to NodePort, the Kubernetes control plane allocates a port from a range specified by the --service-node-port-range flag (default: 30000-32767).
+	# DEBUG : Use minikube start --alsologtostderr -v=7 (for VirtualBox Driver), --alsologtostderr -v=1 (for Docker Driver)
+	# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
+	minikube start --vm-driver=$driver --bootstrapper=kubeadm
 
-		if [[ $? == 0 ]]
-		then
-    		eval $($sudo minikube docker-env)
-    		printf "Minikube started\n"
-		else
-			$sudo minikube delete
-    		echo -ne "$_RED➜$_YELLOW Error occured\n"
-    		exit
-		fi
-
-		# Enable or disable a minikube addon
-		# Measuring Resource Usage
-
-		# minikube addons enable metrics-server
-
-		# Web interface for kubernetes
-
-		# minikube addons enable metallb
-		# minikube addons enable dashboard
+	if [[ $? == 0 ]]
+	then
+    	eval $($sudo minikube docker-env)
+		echo -ne "$_GREEN➜$_YELLOW Minikube started\n"
+	else
+		$sudo minikube delete
+    	echo -ne "$_RED➜$_YELLOW Error occured\n"
+    	exit
 	fi
+
+	# Enable or disable a minikube addon
+	# Measuring Resource Usage
+
+	# minikube addons enable metrics-server
+
+	# Web interface for kubernetes
+
+	# minikube addons enable metallb
+	# minikube addons enable dashboard
 
 	#-----------------Minkube Config-----------------#
 
@@ -335,9 +332,11 @@ if [[ $1 = 'vm' ]] ; then
 	echo -ne "$_GREEN✓$_YELLOW Building Docker images and Deploying services...\n"
 	echo -ne "$_NOCOLOR"
 
-	for SERVICE in $SERVICE_LIST
+	#----------------build images and apply deployments-------------#
+
+	for service in $SERVICE_LIST
 	do
-		apply_yaml $SERVICE
+   		build_apply $service
 	done
 
 	# File deconfiguration
