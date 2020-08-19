@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 12:08:32 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 12:29:17 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -94,6 +94,9 @@ function apply_yaml()
 	# [NAME] = Omitted, here details for all resources are displayed for 'kubectl get pods'
 	# [flags1] = -l <clé-label>=<valeur-label>
 	# [flags2] = -o or --output jsonpath=<modèle> 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' >> check fomatting output
+	while [[ $(kubectl get pods -l app=$@ -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+		sleep 1;
+	done
 	echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 }
 
@@ -337,7 +340,6 @@ if [[ $1 = 'vm' ]] ; then
 	done
 
 	echo -ne "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
-	echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
 
 	# Start dashboard
 	$sudo minikube dashboard &
