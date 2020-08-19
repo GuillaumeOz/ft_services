@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 11:59:23 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 12:08:32 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,11 +82,11 @@ function apply_yaml()
 {
 	# kubectl apply - Apply or Update a resource from a file or stdin.
 	# Create a service using the definition in example-service.yaml.
+	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
+	echo -ne "$_NOCOLOR"
 	docker build -t services/$@ srcs/$@
 	sleep 1;
 	kubectl apply -f srcs/$@.yml > /dev/null
-	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
-	echo -ne "$_NOCOLOR"
 	sleep 2;
 	# kubectl [command] [TYPE] [NAME] [flags]
 	# [command] = get
@@ -94,9 +94,6 @@ function apply_yaml()
 	# [NAME] = Omitted, here details for all resources are displayed for 'kubectl get pods'
 	# [flags1] = -l <clé-label>=<valeur-label>
 	# [flags2] = -o or --output jsonpath=<modèle> 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' >> check fomatting output
-	while [[ $(kubectl get pods -l app=$@ -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-		sleep 1;
-	done
 	echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 }
 
