@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 12:38:20 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 15:50:20 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -221,7 +221,9 @@ if [[ $1 = 'vm' ]] ; then
 	if [[ $? != 0 ]] ; then
 		echo -ne "$_GREEN➜$_YELLOW Install Docker... \n"
 		PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
-		PACKAGES="apt install docker.io"
+		#PACKAGES="apt install docker.io"
+		#sudo systemctl start docker
+		#sudo systemctl enable docker
 		install_packages $PACKAGES
 		$sudo groupadd docker
 		$sudo usermod -a -G docker ${USER}
@@ -249,6 +251,7 @@ if [[ $1 = 'vm' ]] ; then
 	chmod +x minikube
 	$sudo cp minikube /usr/local/bin && rm minikube
 	echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
+	echo -ne "$_NOCOLOR"
 
 	#-------------------Start Minikube------------------#
 	# Start the cluster if it's not running
@@ -269,13 +272,16 @@ if [[ $1 = 'vm' ]] ; then
 		# Note for minikube start --vm-driver=none run -> apt-get install -y conntrack for fix the issus
 		minikube start --vm-driver=$driver --bootstrapper=kubeadm
 
-		if [[ $? != 0 ]]
+		if [[ $? == 0 ]]
 		then
+    		eval $($sudo minikube docker-env)
+    		printf "Minikube started\n"
+		else
 			$sudo minikube delete
-    		echo -ne "$_GREEN➜$_YELLOW Error occured $_GREEN✓$_YELLOW \n"
+    		echo -ne "$_RED➜$_YELLOW Error occured\n"
     		exit
 		fi
-		eval $($sudo minikube docker-env)
+
 		# Enable or disable a minikube addon
 		# Measuring Resource Usage
 
