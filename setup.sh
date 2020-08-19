@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 11:01:07 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 11:14:53 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -221,8 +221,8 @@ if [[ $1 = 'vm' ]] ; then
 		PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
 		install_packages $PACKAGES
 		$sudo groupadd docker
-		$sudo usermod -aG docker ${USER}
-		su -s ${USER}
+		$sudo usermod -a -G docker ${USER}
+		newgrp docker
 		echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 	fi
 
