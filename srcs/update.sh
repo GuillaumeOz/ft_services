@@ -1,21 +1,18 @@
 #! /bin/bash
 
-function sed_configs()
-{
+sed_configs () {
     sed -i.bak 's/MINIKUBE_IP/'"$1"'/g' $2
     echo "configured $2 with $1"
     sleep 1
 }
 
-function sed_configs_back()
-{
+sed_configs_back () {
     sed -i.bak "s/$1/""MINIKUBE_IP"'/g' $2
     echo "deconfigured $2"
     sleep 1
 }
 
-function build_apply()
-{
+build_apply () {
     docker build -t services/$1 srcs/$1
     sleep 1
     kubectl apply -f srcs/$1.yml

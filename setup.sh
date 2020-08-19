@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/18 14:50:29 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 11:01:07 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,6 @@ sed_list="srcs/telegraf/telegraf.conf"
 
 # Ensure USER variabe is set
 [ -z "${USER}" ] && export USER=`whoami`
-[ -z "${WORKDIR}" ] && WORKDIR=`pwd`
 # Set the minikube directory in current folder
 # Enable this command if you run the projet at 42
 # export MINIKUBE_HOME="/goinfre/$USER"
@@ -61,22 +60,19 @@ function install_packages()
 	╚══════════════════════╝\n"
 }
 
-function sed_configs()
-{
+sed_configs () {
     sed -i.bak 's/MINIKUBE_IP/'"$1"'/g' $2
     echo "configured $2 with $1"
     sleep 1
 }
 
-function sed_configs_back()
-{
+sed_configs_back () {
     sed -i.bak "s/$1/""MINIKUBE_IP"'/g' $2
     echo "deconfigured $2"
     sleep 1
 }
 
-function build_apply()
-{
+build_apply () {
     docker build -t services/$1 srcs/$1
     sleep 1
     kubectl apply -f srcs/$1.yml
@@ -224,6 +220,9 @@ if [[ $1 = 'vm' ]] ; then
 		echo -ne "$_GREEN➜$_YELLOW Install Docker... \n"
 		PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
 		install_packages $PACKAGES
+		$sudo groupadd docker
+		$sudo usermod -aG docker ${USER}
+		su -s ${USER}
 		echo -ne "$_GREEN➜$_YELLOW Done $_GREEN✓$_YELLOW \n"
 	fi
 
@@ -348,10 +347,6 @@ if [[ $1 = 'vm' ]] ; then
 	do
   		sed_configs_back $MINIKUBE_IP $name
 	done
-
-	# Import Wordpress database
-	kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql -u root -e 'CREATE DATABASE wordpress;'
-	kubectl exec -i $(kubectl get pods | grep mysql | cut -d" " -f1) -- mysql wordpress -u root < srcs/wordpress/files/wordpress-tmp.sql
 
 	echo -ne "$_GREEN✓$_YELLOW	ft_services deployment complete !\n"
 	echo -ne "$_GREEN➜$_YELLOW	You can access ft_services via this url: $MINIKUBE_IP\n"
