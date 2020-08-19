@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 11:23:08 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 11:59:23 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,6 +82,8 @@ function apply_yaml()
 {
 	# kubectl apply - Apply or Update a resource from a file or stdin.
 	# Create a service using the definition in example-service.yaml.
+	docker build -t services/$@ srcs/$@
+	sleep 1;
 	kubectl apply -f srcs/$@.yml > /dev/null
 	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
 	echo -ne "$_NOCOLOR"
@@ -272,7 +274,7 @@ if [[ $1 = 'vm' ]] ; then
     		echo -ne "$_GREEN➜$_YELLOW Error occured $_GREEN✓$_YELLOW \n"
     		exit
 		fi
-
+		eval $($sudo minikube docker-env)
 		# Enable or disable a minikube addon
 		# Measuring Resource Usage
 
@@ -292,7 +294,6 @@ if [[ $1 = 'vm' ]] ; then
 	# This can be set to allow having multiple instances of minikube independently. (default "minikube")
 	# docker-env Configure environment to use minikube’s Docker daemon
 	# set the environment variable with eval command
-	eval $($sudo minikube docker-env)
 	MINIKUBE_IP="$(kubectl get node -o=custom-columns='DATA:status.addresses[0].address' | sed -n 2p)"
 	# TELEGRAF EDIT .CONF FILE
 
@@ -322,19 +323,9 @@ if [[ $1 = 'vm' ]] ; then
     sed_configs 172.17.0.5 srcs/ftps/setup.sh
     sed_configs 172.17.0.3 srcs/mysql/wordpress.sql
 
-	# Build Docker images
+	# Build Docker images and Deploy services
 
-	echo -ne "$_GREEN➜$_YELLOW Building Docker images...\n"
-	docker build -t mysql_alpine srcs/mysql
-	docker build -t wordpress_alpine srcs/wordpress
-	docker build -t nginx_alpine srcs/nginx
-	docker build -t ftps_alpine srcs/ftps
-	docker build -t grafana_alpine srcs/grafana
-	echo -ne "$_GREEN✓$_YELLOW Deployed !\n"
-
-	# Deploy services
-
-	echo -ne "$_GREEN✓$_YELLOW Deploying services...\n"
+	echo -ne "$_GREEN✓$_YELLOW Building Docker images and Deploying services...\n"
 	echo -ne "$_NOCOLOR"
 
 	for SERVICE in $SERVICE_LIST
