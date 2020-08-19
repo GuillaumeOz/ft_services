@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 11:15:27 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 11:23:08 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,7 +82,7 @@ function apply_yaml()
 {
 	# kubectl apply - Apply or Update a resource from a file or stdin.
 	# Create a service using the definition in example-service.yaml.
-	kubectl apply -f srcs/$@.yaml > /dev/null
+	kubectl apply -f srcs/$@.yml > /dev/null
 	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
 	echo -ne "$_NOCOLOR"
 	sleep 2;
