@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 12:29:17 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 12:38:20 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -221,6 +221,7 @@ if [[ $1 = 'vm' ]] ; then
 	if [[ $? != 0 ]] ; then
 		echo -ne "$_GREEN➜$_YELLOW Install Docker... \n"
 		PACKAGES="apt-get install docker-ce docker-ce-cli containerd.io"
+		PACKAGES="apt install docker.io"
 		install_packages $PACKAGES
 		$sudo groupadd docker
 		$sudo usermod -a -G docker ${USER}
