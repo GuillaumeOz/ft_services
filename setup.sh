@@ -6,7 +6,7 @@
 #    By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/19 16:13:51 by gozsertt          #+#    #+#              #
-#    Updated: 2020/08/19 15:50:20 by gozsertt         ###   ########.fr        #
+#    Updated: 2020/08/19 20:11:09 by gozsertt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -73,31 +73,20 @@ sed_configs_back () {
 }
 
 build_apply () {
+	# kubectl apply - Apply or Update a resource from a file or stdin.
+	# Create a service using the definition in example-service.yaml.
+	echo -ne "$_GREEN➜$_YELLOW	Deploying $1...\n"
+	echo -ne "$_NOCOLOR"
     docker build -t services/$1 srcs/$1
     sleep 1
     kubectl apply -f srcs/$1.yml
-}
-
-function apply_yaml()
-{
-	# kubectl apply - Apply or Update a resource from a file or stdin.
-	# Create a service using the definition in example-service.yaml.
-	echo -ne "$_GREEN➜$_YELLOW	Deploying $@...\n"
-	echo -ne "$_NOCOLOR"
-	docker build -t services/$@ srcs/$@
-	sleep 1;
-	kubectl apply -f srcs/$@.yml > /dev/null
-	sleep 2;
+	echo -ne "$_GREEN✓$_YELLOW	$1 deployed!\n"
 	# kubectl [command] [TYPE] [NAME] [flags]
 	# [command] = get
 	# [TYPE] = pods
 	# [NAME] = Omitted, here details for all resources are displayed for 'kubectl get pods'
 	# [flags1] = -l <clé-label>=<valeur-label>
 	# [flags2] = -o or --output jsonpath=<modèle> 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' >> check fomatting output
-	#while [[ $(kubectl get pods -l app=$@ -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-	#	sleep 1;
-	#done
-	echo -ne "$_GREEN✓$_YELLOW	$@ deployed!\n"
 }
 
 if [[ $1 = 'clean' ]] ; then
