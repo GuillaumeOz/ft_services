@@ -1,4 +1,4 @@
-# ft_services
+# 42 ft_services
 
 `ft_services` is an individual school project at [42 Paris](https://www.42.fr) campus.
 The purpose of this project is to use Kubernetes to virtualize a network and set a production environment.
